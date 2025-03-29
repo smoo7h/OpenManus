@@ -1,0 +1,33 @@
+TASK: Research and create a comprehensive guide on all methods to catch Mew in Pokémon Red and Blue
+
+OBJECTIVE:
+Create a well-structured, visually appealing research report documenting every possible method to obtain Mew in the original Pokémon Red/Blue games. Include both official methods and unofficial exploits/glitches.
+
+REQUIRED ACTIONS:
+1. Research all known methods for catching/obtaining Mew in Pokémon Red/Blue versions, including:
+   - Official Nintendo event distributions
+   - The Mew glitch / Trainer-Fly glitch
+   - Long-range Trainer glitch
+   - Arbitrary code execution methods
+   - Any other documented approaches
+
+2. For each method:
+   - Provide detailed step-by-step instructions
+   - Note required game version or hardware
+   - Include probability of success and potential risks
+   - Document prerequisites (game progress, items needed, etc.)
+
+3. Find and include relevant screenshots/images to illustrate the methods
+
+OUTPUT FORMAT:
+- Create multiple .md files organized in a logical structure
+- Use clean Markdown formatting with headers, lists, code blocks where appropriate
+- Include a main README.md with table of contents linking to other files
+- Embed relevant images with proper attribution
+- Include citations for information sources
+
+ADDITIONAL CONSIDERATIONS:
+- Focus on technical accuracy and completeness
+- Make the guide accessible to both beginners and experienced players
+- Flag methods that might risk save file corruption
+- Include historical context about Mew and its significance

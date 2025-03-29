@@ -1,1 +1,0 @@
-Do research and compile a report outlining in detail how to catch all of the The three legendary birds in Pokémon. Articuno, Zapdos, and Moltres. \r\n The report should made out of .md files that have images and look nice
