@@ -1,5 +1,7 @@
 import asyncio
+import glob
 import os
+import random
 
 from app.agent.manus import Manus
 from app.logger import logger
@@ -11,21 +13,25 @@ async def main():
         prompt = input("Enter your prompt: ")
         if not prompt.strip():
             logger.info(
-                "No prompt provided, using default prompt from prompts/prompt.txt"
+                "No prompt provided, selecting a random prompt from the prompts/ directory"
             )
             try:
-                prompt_file_path = "prompts/prompt.txt"
-                if os.path.exists(prompt_file_path):
-                    with open(prompt_file_path, "r") as f:
-                        prompt = f.read()
-                    if not prompt.strip():
-                        logger.warning("Default prompt file is empty.")
-                        return
-                else:
-                    logger.warning("Default prompt file not found.")
+                prompt_files = glob.glob("prompts/*.txt")
+                if not prompt_files:
+                    logger.warning("No prompt files found in the prompts/ directory.")
+                    return
+
+                selected_prompt_file = random.choice(prompt_files)
+                logger.info(f"Using prompt from: {selected_prompt_file}")
+                with open(selected_prompt_file, "r") as f:
+                    prompt = f.read()
+                if not prompt.strip():
+                    logger.warning(
+                        f"Selected prompt file '{selected_prompt_file}' is empty."
+                    )
                     return
             except Exception as e:
-                logger.error(f"Error reading default prompt file: {e}")
+                logger.error(f"Error reading prompt file: {e}")
                 return
 
         logger.warning("Processing your request...")

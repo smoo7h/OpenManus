@@ -1,8 +1,12 @@
 #!/usr/bin/env python
 import argparse
 import asyncio
+import glob
 import os
+import random
 import sys
+from datetime import datetime
+from pathlib import Path
 
 from app.agent.mcp import MCPAgent
 from app.config import config
@@ -55,21 +59,27 @@ class MCPRunner:
         prompt = input("Enter your prompt: ")
         if not prompt.strip():
             logger.info(
-                "No prompt provided, using default prompt from prompts/prompt.txt"
+                "No prompt provided, selecting a random prompt from the prompts/ directory"
             )
             try:
-                prompt_file_path = "prompts/prompt.txt"
-                if os.path.exists(prompt_file_path):
-                    with open(prompt_file_path, "r") as f:
-                        prompt = f.read()
-                    if not prompt.strip():
-                        logger.warning("Default prompt file is empty.")
-                        return
-                else:
-                    logger.warning("Default prompt file not found.")
+                # Use absolute path to the prompts directory from the project root
+                prompts_path = os.path.join(self.root_path, "prompts", "*.txt")
+                prompt_files = glob.glob(prompts_path)
+                if not prompt_files:
+                    logger.warning("No prompt files found in the prompts/ directory.")
+                    return
+
+                selected_prompt_file = random.choice(prompt_files)
+                logger.info(f"Using prompt from: {selected_prompt_file}")
+                with open(selected_prompt_file, "r") as f:
+                    prompt = f.read()
+                if not prompt.strip():
+                    logger.warning(
+                        f"Selected prompt file '{selected_prompt_file}' is empty."
+                    )
                     return
             except Exception as e:
-                logger.error(f"Error reading default prompt file: {e}")
+                logger.error(f"Error reading prompt file: {e}")
                 return
 
         logger.warning("Processing your request...")
@@ -109,7 +119,20 @@ async def run_mcp() -> None:
     args = parse_args()
     runner = MCPRunner()
 
+    original_cwd = os.getcwd()
     try:
+        # --- Create unique task directory ---
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        task_dir_name = f"mcp_run_{timestamp}"
+        task_path = config.workspace_root / task_dir_name
+        task_path.mkdir(parents=True, exist_ok=True)
+        logger.info(f"Created task directory: {task_path}")
+
+        # --- Change CWD to task directory ---
+        os.chdir(task_path)
+        logger.info(f"Changed working directory to: {task_path}")
+
+        # --- Initialize and run the agent ---
         await runner.initialize(args.connection, args.server_url)
 
         if args.prompt:
@@ -125,6 +148,10 @@ async def run_mcp() -> None:
         logger.error(f"Error running MCPAgent: {str(e)}", exc_info=True)
         sys.exit(1)
     finally:
+        # --- Restore original CWD ---
+        os.chdir(original_cwd)
+        logger.info(f"Restored working directory to: {original_cwd}")
+        # --- Cleanup agent resources ---
         await runner.cleanup()
 
 

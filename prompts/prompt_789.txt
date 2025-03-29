@@ -1,0 +1,43 @@
+Manus, your task is to develop a web application that features a self-playing Tetris game. The game should run autonomously with AI deciding how to rotate and place the falling tetrominoes, and users should be able to watch the gameplay unfold. Below are the detailed requirements to guide your development process.
+
+Requirements:
+1. Game Interface
+Design: Create a standard Tetris game UI that includes:
+A rectangular playfield (well) where the tetrominoes fall and stack.
+A display area showing the next upcoming tetromino.
+A score counter (based on lines cleared, level, etc.).
+A level indicator.
+Responsiveness: Ensure the interface is reasonably responsive, though the core gameplay area might have a fixed aspect ratio.
+Optional Enhancements: Consider adding features like a "hold" piece area, ghost piece visualization (showing where the piece will land), or different visual themes.
+
+2. AI Implementation
+Algorithm: Implement an evaluation function or heuristic algorithm for the AI to determine the optimal placement (position and rotation) for the current falling tetromino. Common heuristics involve minimizing height, maximizing line clears, reducing holes, and ensuring flatness.
+Strategy: Program the AI to analyze possible moves for the current piece and choose the one that scores best according to its evaluation function.
+Difficulty Progression: The game speed (how fast pieces fall) should increase as the player reaches higher levels (based on lines cleared). The AI must adapt to increasing speeds.
+Visualization: Provide visual cues to indicate the AI's chosen placement before the piece locks (optional, could use a ghost piece).
+
+3. Game Mechanics
+Basic Rules: Follow standard Tetris rules (Tetris Guideline is a good reference). Tetrominoes fall from the top; the player can move them left/right, rotate them, and make them fall faster (soft drop) or instantly (hard drop). Completed horizontal lines are cleared, and blocks above fall down.
+Tetromino Generation: Randomly generate the sequence of tetrominoes (using a standard 7-bag random generator is recommended).
+Movement & Rotation: Implement standard tetromino movement and rotation logic (e.g., SRS - Super Rotation System).
+Line Clearing & Scoring: Detect and clear completed lines, award points based on the number of lines cleared at once (Single, Double, Triple, Tetris), and update the level.
+Game Over Conditions: End the game when a newly spawned tetromino cannot fit within the top of the playfield (block out).
+Autonomous Play: The AI controls all piece movements (translation, rotation, dropping).
+
+4. Technical Implementation
+Frontend: Use vanilla JavaScript, HTML, and CSS or choose a framework such as React or Vue.js to build the game.
+Animation: Implement animations for piece falling, locking, and line clearing.
+Game Loop: Create an efficient game loop that manages piece falling, AI decision-making, input processing (if any user interaction is added later), collision detection, line clearing, and rendering.
+State Management: Maintain the state of the playfield grid accurately.
+
+5. User Experience
+Initial State: When the user opens the app, display a brief introduction and automatically start the game:
+"Welcome to Self-Playing Tetris! Watch the AI stack the blocks."
+Visual Feedback: Ensure clear visual feedback for piece movement, locking, line clears, level ups, and game over.
+
+6. Additional Notes
+Performance: Optimize the game to run smoothly, especially the AI calculation which needs to happen quickly for each piece.
+Focus: Prioritize creating an effective AI that plays Tetris competently and achieves high scores, making it interesting to watch.
+Customization: Consider allowing users to adjust the AI's strategy parameters or the starting level.
+
+By following these guidelines, you will create a webapp that offers users an engaging self-playing Tetris game. The application should be functional, visually appealing, and showcase competent AI play.

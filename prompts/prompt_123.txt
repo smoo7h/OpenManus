@@ -1,0 +1,42 @@
+Manus, your task is to develop a web application that features a self-playing Pong game. The game should run autonomously with AI controlling one or both paddles, and users should be able to watch the gameplay unfold. Below are the detailed requirements to guide your development process.
+
+Requirements:
+1. Game Interface
+Design: Create a simple and clear game UI that includes:
+A rectangular play area representing the Pong table.
+Two paddles, one on each side (left/right or top/bottom).
+A ball that moves across the play area.
+A score counter for each player (or AI vs AI).
+Responsiveness: Ensure the interface is fully responsive and functions seamlessly on both desktop and mobile devices.
+Optional Enhancements: Consider adding features like adjustable ball speed, different paddle sizes, or visual effects on collision.
+
+2. AI Implementation
+Algorithm: Implement a reactive algorithm for the AI paddle(s) to track the ball's vertical position.
+Strategy: Program the AI paddle to move up or down to intercept the ball and return it. For two AI players, ensure they react realistically.
+Difficulty Progression: Optionally, make the AI's reaction time or accuracy change based on score or time.
+Visualization: Provide visual cues to indicate the AI's intended movement (optional).
+
+3. Game Mechanics
+Basic Rules: Follow standard Pong rules. The ball bounces off the top and bottom walls (or side walls if vertical) and the paddles. A point is scored when one player misses the ball.
+Ball Movement: Implement realistic ball physics, including angle changes upon hitting a paddle.
+Paddle Movement: Allow AI paddles to move vertically (or horizontally if vertical layout) within the bounds of the play area.
+Scoring: Increment the score for the opposing player when a player fails to return the ball.
+Game End/Restart: Define conditions for ending a match (e.g., first to 10 points) and automatically restart after a brief pause.
+
+4. Technical Implementation
+Frontend: Use vanilla JavaScript, HTML, and CSS or choose a framework such as React or Vue.js to build the game.
+Animation: Implement smooth animations for ball and paddle movement using requestAnimationFrame or similar techniques.
+Game Loop: Create an efficient game loop that manages updates (ball position, paddle position, collision detection) and rendering.
+Autonomous Restart: After a match ends, automatically restart a new match after a brief pause.
+
+5. User Experience
+Initial State: When the user opens the app, display a brief introduction and automatically start the game:
+"Welcome to Self-Playing Pong! Watch the AI battle it out."
+Visual Feedback: Ensure clear visual feedback for ball collisions, scoring, and the end of a match.
+
+6. Additional Notes
+Performance: Optimize the game to run smoothly without lag.
+Focus: Prioritize creating a believable and engaging AI rally that's interesting to watch.
+Customization: Consider allowing users to adjust parameters like AI difficulty or match point limit.
+
+By following these guidelines, you will create a webapp that offers users a captivating and entertaining self-playing Pong game. The application should be functional, visually appealing, and showcase interesting AI behavior that makes the autonomous gameplay engaging to watch.

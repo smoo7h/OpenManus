@@ -1,3 +1,4 @@
+import os
 from contextlib import AsyncExitStack
 from typing import List, Optional
 
@@ -6,6 +7,7 @@ from mcp.client.sse import sse_client
 from mcp.client.stdio import stdio_client
 from mcp.types import TextContent
 
+from app.config import config
 from app.logger import logger
 from app.tool.base import BaseTool, ToolResult
 from app.tool.tool_collection import ToolCollection
@@ -67,7 +69,18 @@ class MCPClients(ToolCollection):
         if self.session:
             await self.disconnect()
 
-        server_params = StdioServerParameters(command=command, args=args)
+        # Prepare environment for the subprocess
+        env = os.environ.copy()
+        project_root = str(config.root_path.resolve())
+        python_path = env.get("PYTHONPATH", "")
+        if project_root not in python_path.split(os.pathsep):
+            env["PYTHONPATH"] = (
+                f"{project_root}{os.pathsep}{python_path}"
+                if python_path
+                else project_root
+            )
+
+        server_params = StdioServerParameters(command=command, args=args, env=env)
         stdio_transport = await self.exit_stack.enter_async_context(
             stdio_client(server_params)
         )
