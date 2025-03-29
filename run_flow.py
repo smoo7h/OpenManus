@@ -1,4 +1,5 @@
 import asyncio
+import os
 import time
 
 from app.agent.manus import Manus
@@ -14,9 +15,24 @@ async def run_flow():
     try:
         prompt = input("Enter your prompt: ")
 
+        prompt_file_path = "prompts/prompt.txt"
         if prompt.strip().isspace() or not prompt:
-            logger.warning("Empty prompt provided.")
-            return
+            logger.info(
+                "No prompt provided, using default prompt from prompts/prompt.txt"
+            )
+            try:
+                if os.path.exists(prompt_file_path):
+                    with open(prompt_file_path, "r") as f:
+                        prompt = f.read()
+                    if not prompt.strip():
+                        logger.warning("Default prompt file is empty.")
+                        return
+                else:
+                    logger.warning("Default prompt file not found.")
+                    return
+            except Exception as e:
+                logger.error(f"Error reading default prompt file: {e}")
+                return
 
         flow = FlowFactory.create_flow(
             flow_type=FlowType.PLANNING,

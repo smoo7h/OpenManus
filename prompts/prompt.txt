@@ -1,32 +1,39 @@
-TASK: Dive into the 90s and create the ultimate guide to unlocking hidden secrets in classic video games
+Manus, your task is to develop a web application that features a self-playing snake game. The game should run autonomously with AI controlling the snake's movement, and users should be able to watch the gameplay unfold. Below are the detailed requirements to guide your development process.
 
-OBJECTIVE:
-Craft a nostalgic, visually engaging guide that explores the most iconic cheats, glitches, and hidden secrets in beloved 90s video games. Highlight the magic of discovering these secrets during the golden age of gaming.
+Requirements:
+1. Game Interface
+Design: Create an intuitive and engaging game UI that includes:
+A canvas or grid area where the snake game is displayed.
+A score counter showing the current length of the snake.
+Responsiveness: Ensure the interface is fully responsive and functions seamlessly on both desktop and mobile devices.
+Optional Enhancements: Consider adding features like game speed controls, visual themes, or a high score display to enhance the user experience.
 
-REQUIRED ACTIONS:
-1. Research and document legendary cheats, glitches, and Easter eggs from popular 90s games, including:
-   - Famous cheat codes (e.g., Konami Code, Mortal Kombat blood code)
-   - Game-breaking glitches (e.g., MissingNo in Pokémon Red/Blue)
-   - Hidden characters, levels, or items (e.g., Reptile in Mortal Kombat, Warp Zones in Mario)
-   - Unofficial exploits and tricks (e.g., debug modes, cartridge tilting)
+2. AI Implementation
+Algorithm: Implement a pathfinding algorithm for the snake to navigate the board efficiently.
+Strategy: Program the snake to avoid collisions with walls and itself while seeking food items.
+Difficulty Progression: Make the AI gradually increase in complexity as the game progresses and the snake grows longer.
+Visualization: Provide visual cues to indicate the AI's decision-making process (optional).
 
-2. For each secret:
-   - Provide detailed step-by-step instructions to replicate it
-   - Note the game title, platform, and version
-   - Include any risks (e.g., save file corruption, game crashes)
-   - Share fun facts or historical context about its discovery
+3. Game Mechanics
+Basic Rules: Follow standard snake game rules where the snake grows when eating food.
+Food Placement: Randomly spawn food items on the board in valid positions.
+Collision Detection: Implement proper detection for wall and self-collisions.
+Game Over Conditions: End the game when the snake collides with a wall or itself.
 
-3. Include screenshots, images, or diagrams to illustrate each secret and its execution
+4. Technical Implementation
+Frontend: Use vanilla JavaScript, HTML, and CSS or choose a framework such as React or Vue.js to build the game.
+Animation: Implement smooth animations for snake movement using requestAnimationFrame or similar techniques.
+Game Loop: Create an efficient game loop that manages updates and rendering at appropriate intervals.
+Autonomous Restart: After a game over, automatically restart the game after a brief pause.
 
-OUTPUT FORMAT:
-- Create multiple .md files organized by game or genre
-- Use clean Markdown formatting with headers, lists, and code blocks where appropriate
-- Include a main README.md with a table of contents linking to other files
-- Embed relevant images with proper attribution
-- Include citations for information sources
+5. User Experience
+Initial State: When the user opens the app, display a brief introduction and automatically start the game:
+"Welcome to Self-Playing Snake! Watch as the AI navigates through the game."
+Visual Feedback: Ensure clear visual feedback when the snake eats food, grows, or when game over occurs.
 
-ADDITIONAL CONSIDERATIONS:
-- Emphasize the nostalgic charm of 90s gaming culture
-- Make the guide accessible to both casual gamers and retro enthusiasts
-- Highlight the cultural impact of these secrets and their role in gaming history
-- Include tips for replicating these secrets on modern hardware or emulators
+6. Additional Notes
+Performance: Optimize the game to run smoothly without lag, even as the snake grows longer.
+Focus: Prioritize creating a hypnotic and fascinating AI behavior that's interesting to watch.
+Customization: Consider allowing users to adjust parameters like game speed or board size.
+
+By following these guidelines, you will create a webapp that offers users a captivating and entertaining self-playing snake game. The application should be functional, visually appealing, and showcase interesting AI behavior that makes the autonomous gameplay engaging to watch.
