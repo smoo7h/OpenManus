@@ -1,33 +1,32 @@
-TASK: Research and create a comprehensive guide on all methods to catch Mew in Pokémon Red and Blue
+TASK: Dive into the 90s and create the ultimate guide to unlocking hidden secrets in classic video games
 
 OBJECTIVE:
-Create a well-structured, visually appealing research report documenting every possible method to obtain Mew in the original Pokémon Red/Blue games. Include both official methods and unofficial exploits/glitches.
+Craft a nostalgic, visually engaging guide that explores the most iconic cheats, glitches, and hidden secrets in beloved 90s video games. Highlight the magic of discovering these secrets during the golden age of gaming.
 
 REQUIRED ACTIONS:
-1. Research all known methods for catching/obtaining Mew in Pokémon Red/Blue versions, including:
-   - Official Nintendo event distributions
-   - The Mew glitch / Trainer-Fly glitch
-   - Long-range Trainer glitch
-   - Arbitrary code execution methods
-   - Any other documented approaches
+1. Research and document legendary cheats, glitches, and Easter eggs from popular 90s games, including:
+   - Famous cheat codes (e.g., Konami Code, Mortal Kombat blood code)
+   - Game-breaking glitches (e.g., MissingNo in Pokémon Red/Blue)
+   - Hidden characters, levels, or items (e.g., Reptile in Mortal Kombat, Warp Zones in Mario)
+   - Unofficial exploits and tricks (e.g., debug modes, cartridge tilting)
 
-2. For each method:
-   - Provide detailed step-by-step instructions
-   - Note required game version or hardware
-   - Include probability of success and potential risks
-   - Document prerequisites (game progress, items needed, etc.)
+2. For each secret:
+   - Provide detailed step-by-step instructions to replicate it
+   - Note the game title, platform, and version
+   - Include any risks (e.g., save file corruption, game crashes)
+   - Share fun facts or historical context about its discovery
 
-3. Find and include relevant screenshots/images to illustrate the methods
+3. Include screenshots, images, or diagrams to illustrate each secret and its execution
 
 OUTPUT FORMAT:
-- Create multiple .md files organized in a logical structure
-- Use clean Markdown formatting with headers, lists, code blocks where appropriate
-- Include a main README.md with table of contents linking to other files
+- Create multiple .md files organized by game or genre
+- Use clean Markdown formatting with headers, lists, and code blocks where appropriate
+- Include a main README.md with a table of contents linking to other files
 - Embed relevant images with proper attribution
 - Include citations for information sources
 
 ADDITIONAL CONSIDERATIONS:
-- Focus on technical accuracy and completeness
-- Make the guide accessible to both beginners and experienced players
-- Flag methods that might risk save file corruption
-- Include historical context about Mew and its significance
+- Emphasize the nostalgic charm of 90s gaming culture
+- Make the guide accessible to both casual gamers and retro enthusiasts
+- Highlight the cultural impact of these secrets and their role in gaming history
+- Include tips for replicating these secrets on modern hardware or emulators
