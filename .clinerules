@@ -1,0 +1,128 @@
+# OpenManus Project Intelligence
+
+This file captures key insights, patterns, and preferences specific to the OpenManus project. It serves as a learning journal to help maintain consistency and effectiveness when working with this codebase.
+
+## Project Structure Patterns
+
+1. **Agent Hierarchy**:
+   - BaseAgent → ToolCallAgent → BrowserAgent → Manus
+   - Each level adds specific capabilities while maintaining the core interface
+   - When extending, always call parent methods using `super()` to preserve functionality
+
+2. **Tool Implementation**:
+   - Tools are standalone classes implementing a consistent interface
+   - Each tool has a name, description, and execute method
+   - Tools are registered with a ToolCollection for access by agents
+   - Special tools (like Terminate) have specific handling in the agent
+
+3. **Memory Management**:
+   - Memory is message-based, with different roles (user, system, assistant, tool)
+   - Messages are stored in chronological order
+   - Context is built from relevant messages for LLM prompting
+
+4. **Configuration Approach**:
+   - TOML-based configuration in config/config.toml
+   - Environment-specific settings (API keys, URLs) in configuration
+   - Sensible defaults with override capabilities
+
+## Code Style Preferences
+
+1. **Python Conventions**:
+   - Type hints used throughout the codebase
+   - Pydantic models for data validation
+   - Docstrings in Google style format
+   - Async/await for asynchronous operations
+
+2. **Error Handling**:
+   - Specific exception types in app/exceptions.py
+   - Context managers for state transitions
+   - Graceful degradation when possible
+
+3. **Logging**:
+   - Consistent use of the logger module
+   - Different log levels for different severity
+   - User-facing messages vs. debug information
+
+## Implementation Patterns
+
+1. **Agent Execution Flow**:
+   1. Initialize agent with configuration
+   2. Set up memory with initial user request
+   3. Enter running state context
+   4. Execute steps until completion or max steps
+   5. Clean up resources
+   6. Return results
+
+2. **Tool Execution Pattern**:
+   1. Select appropriate tool based on context
+   2. Prepare parameters for the tool
+   3. Execute the tool and capture results
+   4. Update memory with tool results
+   5. Decide next action based on results
+
+3. **Browser Interaction Pattern**:
+   1. Initialize browser if not already running
+   2. Execute browser action (navigate, click, etc.)
+   3. Capture screenshot and state
+   4. Update memory with visual context
+   5. Process next action with visual information
+
+## Critical Implementation Paths
+
+1. **Agent Step Execution**:
+   - `BaseAgent.run()` → loop of `step()` calls → tool execution → memory updates
+
+2. **Tool Selection**:
+   - `ToolCallAgent.think()` → LLM decision → tool selection → `_execute_tool()`
+
+3. **Browser Automation**:
+   - `BrowserAgent.think()` → get browser state → update context → tool execution
+
+4. **Memory Context Building**:
+   - Message collection → filtering relevant messages → formatting for LLM
+
+## Known Challenges
+
+1. **LLM Context Limitations**:
+   - Large memory histories can exceed token limits
+   - Need to summarize or filter messages for long-running sessions
+
+2. **Browser Automation Reliability**:
+   - Web pages can change structure, breaking selectors
+   - Need robust error handling for browser interactions
+
+3. **Sandbox Security**:
+   - Python execution carries inherent risks
+   - Docker sandbox adds overhead but is necessary for security
+
+4. **Configuration Complexity**:
+   - Multiple LLM providers with different requirements
+   - Need to balance flexibility with ease of use
+
+## Evolution of Project Decisions
+
+1. **Initial Focus**: Core agent functionality with basic tools
+2. **Current Focus**: Expanding tool capabilities and improving reliability
+3. **Future Direction**: Multi-agent coordination and enhanced user experience
+
+## Tool Usage Patterns
+
+1. **Python Execution**:
+   - Best for data processing, calculations, and algorithmic tasks
+   - Always run in sandbox for security
+
+2. **Browser Automation**:
+   - Ideal for web interaction, data collection, and visual tasks
+   - Screenshots provide important context for decision-making
+
+3. **File Operations**:
+   - Used for persistent storage and data exchange
+   - Workspace directory is the primary location for agent-created files
+
+4. **Terminal Commands**:
+   - Useful for system interaction and external tool integration
+   - Should be used cautiously due to security implications
+
+5. **Web Search**:
+   - Provides up-to-date information from the internet
+   - Multiple fallback engines ensure reliability
