@@ -21,6 +21,7 @@ services:
       - "3000:3000"
     volumes:
       - ./web/keys:/app/keys:ro
+      - ./workspace:/workspace
     environment:
       - DATABASE_URL=${DATABASE_URL}
       - MANUS_URL=http://core:5172
