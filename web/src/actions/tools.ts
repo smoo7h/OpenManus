@@ -1,7 +1,6 @@
 'use server';
 import { AuthWrapperContext, withUserAuth } from '@/lib/auth-wrapper';
-import { decryptWithPrivateKey, encryptWithPublicKey } from '@/lib/crypto';
-import { maskDataForFlatObject } from '@/lib/maskdata';
+import { encryptWithPublicKey } from '@/lib/crypto';
 import { prisma } from '@/lib/prisma';
 import Ajv from 'ajv';
 import fs from 'fs';
@@ -11,7 +10,6 @@ import path from 'path';
 const MANUS_URL = process.env.MANUS_URL || 'http://localhost:5172';
 
 const publicKey = fs.readFileSync(path.join(process.cwd(), 'keys', 'public.pem'), 'utf8');
-const privateKey = fs.readFileSync(path.join(process.cwd(), 'keys', 'private.pem'), 'utf8');
 
 const ajv = new Ajv();
 
@@ -95,4 +93,14 @@ export const closeTool = withUserAuth(async ({ organization, args }: AuthWrapper
 export const getToolsInfo = withUserAuth(async ({}: AuthWrapperContext<{}>) => {
   const tools = await prisma.tools.findMany({});
   return tools;
+});
+
+/**
+ * get all ToolKits from organization
+ */
+export const getToolKitsInfo = withUserAuth(async ({ organization }: AuthWrapperContext<{}>) => {
+  const toolKits = await prisma.toolKits.findMany({
+    where: { organizationId: organization.id },
+  });
+  return toolKits;
 });

@@ -27,10 +27,8 @@ Core Principles:
    - Each task has its own dedicated workspace directory ({task_dir})
    - When using tools that require file paths:
      * Convert relative paths to absolute paths using the task directory
-     * Example: If a file is at "{task_dir}/input.txt" in task space, use "{real_task_dir}/input.txt"
    - When responding to users:
-     * Always use task-relative paths (e.g., "{task_dir}/input.txt")
-     * Do not expose the full system paths
+     * Always use task paths (e.g., "/{task_dir}/input.txt")
    - File Organization:
      * Store all task-related files within the task directory
      * Maintain a clear directory structure for different file types

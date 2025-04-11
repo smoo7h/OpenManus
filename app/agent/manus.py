@@ -55,7 +55,6 @@ class Manus(ReActAgent):
         directory="/workspace",
         task_id="Not Specified",
         task_dir="Not Specified",
-        real_task_dir=config.workspace_root,
         language="English",
         current_date=datetime.now().strftime("%Y-%m-%d"),
     )
@@ -82,21 +81,16 @@ class Manus(ReActAgent):
         if not os.path.exists(self.task_dir):
             os.makedirs(self.task_dir)
 
-        real_task_dir = os.path.join(
-            config.workspace_root, self.task_dir.replace("/workspace/", "")
-        )
         self.system_prompt = SYSTEM_PROMPT.format(
             directory="/workspace",
             task_id=self.task_id,
             task_dir=self.task_dir,
-            real_task_dir=real_task_dir,
             language=self.language or "English",
             current_date=datetime.now().strftime("%Y-%m-%d"),
         )
         self.next_step_prompt = NEXT_STEP_PROMPT.format(
             language=self.language or "English",
             task_dir=self.task_dir,
-            real_task_dir=real_task_dir,
         )
 
         self.memory.add_message(Message.system_message(self.system_prompt))
