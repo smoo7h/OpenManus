@@ -9,15 +9,27 @@ import Markdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
 import remarkGfm from 'remark-gfm';
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 import { Button } from '@/components/ui/button';
+
+const DEFAULT_SELECTED_TOOLS = ['web_search', 'str_replace_editor', 'python_execute', 'browser_use'];
 
 export const useSelectedTools = create<{
   selected: string[];
   setSelected: (selected: string[]) => void;
-}>(set => ({
-  selected: ['web_search', 'str_replace_editor', 'python_execute', 'browser_use'],
-  setSelected: selected => set({ selected }),
-}));
+}>()(
+  persist(
+    set => ({
+      selected: [],
+      setSelected: selected => set({ selected }),
+    }),
+    {
+      name: 'selected-tools-storage',
+      storage: createJSONStorage(() => localStorage),
+      partialize: state => ({ selected: state.selected.length > 0 ? state.selected : DEFAULT_SELECTED_TOOLS }),
+    },
+  ),
+);
 
 interface ToolsConfigDialogProps {
   open: boolean;

@@ -112,7 +112,7 @@ export const ChatInput = ({ status = 'idle', onSubmit, onTerminate }: ChatInputP
             <div className="flex items-center gap-2">
               <Badge variant="outline" className="flex cursor-pointer items-center gap-1" onClick={() => setToolsConfigDialogOpen(true)}>
                 <Wrench className="h-3 w-3" />
-                <span>Tools ({selectedTools.length})</span>
+                <span>Tools {selectedTools.length ? `(${selectedTools.length})` : ''}</span>
               </Badge>
             </div>
             <div className="flex items-center gap-2">
