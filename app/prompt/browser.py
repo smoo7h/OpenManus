@@ -91,7 +91,8 @@ Available browser actions:
 - Extract: browser_use with action="extract_content", goal="..."
 - Scroll: browser_use with action="scroll_down" or "scroll_up"
 
-Execution requirements:
-- Monitor visible and viewport-external content
-- Track progress and maintain task context
+Consider both what's visible and what might be beyond the current viewport.
+Be methodical - remember your progress and what you've learned so far.
+
+If you want to stop the interaction at any point, use the `terminate` tool/function call.
 """
