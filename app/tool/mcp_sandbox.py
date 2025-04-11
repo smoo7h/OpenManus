@@ -61,6 +61,12 @@ class MCPSandboxClients(ToolCollection):
         self.client_id = client_id
         self.exit_stack = AsyncExitStack()
 
+        # Always create a new container but use cached images
+        # Generate a container name with timestamp to ensure uniqueness
+        timestamp = int(time.time())
+        container_name = f"openmanus-sandbox-{self.client_id}-{timestamp}-{self.name}"
+        self.container_name = container_name
+
     def _get_command_type(self, command: str) -> str:
         """Determine the type of command (uvx/npx/docker)."""
         if command.startswith("uvx"):
@@ -88,10 +94,43 @@ class MCPSandboxClients(ToolCollection):
 
         # Build a unified docker command
         docker_command = "docker"
-        docker_args = ["run", "--rm", "-i"]
+
+        logger.info(f"Creating new container: {self.container_name}")
+
+        # For docker commands, use the original parameters directly
+        if command_type == "docker":
+            return StdioServerParameters(
+                command=parameters.command,
+                args=parameters.args,
+            )
+
+        # Otherwise create a new container with --rm flag to ensure cleanup
+        docker_args = ["run", "--rm", "-i", "--name", self.container_name]
 
         # Add network configuration
         docker_args.extend(["--network", "openmanus-container-network"])
+
+        # Add volume mounts for package caches to persist between container runs
+        if command_type == "uvx":
+            # Map Python package cache directories
+            docker_args.extend(
+                [
+                    "-v",
+                    "openmanus-pip-cache:/root/.cache/pip",
+                    "-v",
+                    "openmanus-uv-cache:/root/.cache/uv",
+                ]
+            )
+        elif command_type == "npx":
+            # Map npm package cache directories
+            docker_args.extend(
+                [
+                    "-v",
+                    "openmanus-npm-cache:/root/.npm",
+                    "-v",
+                    "openmanus-yarn-cache:/usr/local/share/.cache/yarn",
+                ]
+            )
 
         # Add environment variables to docker command
         env_vars = {
@@ -104,39 +143,29 @@ class MCPSandboxClients(ToolCollection):
         }
         for key, value in env_vars.items():
             docker_args.extend(["-e", f"{key}={value}"])
+
+        # Add custom environment variables from parameters
         for key, value in parameters.env.items():
             docker_args.extend(["-e", f"{key}={value}"])
 
-        # Set different images and volumes based on command type
-        # uvx
+        # Set different images and commands based on command type
         if command_type == "uvx":
             docker_args.extend(
                 [
                     "iheytang/openmanus-sandbox-uvenv:latest",
                     "bash",
                     "-c",
+                    f"uvx {' '.join(parameters.args)}",
                 ]
             )
-            # Directly use pip to install and run packages
-            start_cmd = f"uvx {' '.join(parameters.args)}"
-            docker_args.append(start_cmd)
-        # npx
         elif command_type == "npx":
             docker_args.extend(
                 [
                     "iheytang/openmanus-sandbox-nodejs:latest",
                     "bash",
                     "-c",
+                    f"{parameters.command} {' '.join(parameters.args)}",
                 ]
-            )
-            # Keep the original command and arguments unchanged
-            start_cmd = f"{parameters.command} {' '.join(parameters.args)}"
-            docker_args.append(start_cmd)
-        elif command_type == "docker":
-            # If it's a docker command, use the original parameters directly
-            return StdioServerParameters(
-                command=parameters.command,
-                args=parameters.args,
             )
 
         return StdioServerParameters(
