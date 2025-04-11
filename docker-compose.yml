@@ -48,11 +48,10 @@ services:
     depends_on:
       - openmanus-core
     networks:
-      - websites_web
+      - openmanus-container-network
     # 指定端口 即前端的访问端口
     ports:
       - "3010:3010"
 
 networks:
   openmanus-container-network:
-    name: openmanus-container-network
