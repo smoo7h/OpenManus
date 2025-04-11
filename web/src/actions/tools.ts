@@ -94,13 +94,3 @@ export const getToolsInfo = withUserAuth(async ({}: AuthWrapperContext<{}>) => {
   const tools = await prisma.tools.findMany({});
   return tools;
 });
-
-/**
- * get all ToolKits from organization
- */
-export const getToolKitsInfo = withUserAuth(async ({ organization }: AuthWrapperContext<{}>) => {
-  const toolKits = await prisma.toolKits.findMany({
-    where: { organizationId: organization.id },
-  });
-  return toolKits;
-});
