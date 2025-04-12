@@ -102,6 +102,7 @@ class MCPSandboxClients(ToolCollection):
             return StdioServerParameters(
                 command=parameters.command,
                 args=parameters.args,
+                env=parameters.env,
             )
 
         # Otherwise create a new container with --rm flag to ensure cleanup
@@ -155,7 +156,7 @@ class MCPSandboxClients(ToolCollection):
                     "iheytang/openmanus-sandbox-uvenv:latest",
                     "bash",
                     "-c",
-                    f"uvx {' '.join(parameters.args)}",
+                    f"{parameters.command} {' '.join(parameters.args)}",
                 ]
             )
         elif command_type == "npx":
@@ -186,8 +187,6 @@ class MCPSandboxClients(ToolCollection):
         server_params = self._convert_to_docker_command(
             StdioServerParameters(command=command, args=args, env=env)
         )
-        full_command = f"{server_params.command} {' '.join(server_params.args)}"
-
         # Use stdio_client provided by mcp library
         stdio_transport = await self.exit_stack.enter_async_context(
             stdio_client(server_params)
