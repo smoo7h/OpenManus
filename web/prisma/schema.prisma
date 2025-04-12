@@ -8,6 +8,12 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator json {
+  // Read more: https://github.com/arthurfiorette/prisma-json-types-generator
+  provider = "prisma-json-types-generator"
+  allowAny = "true"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
@@ -149,6 +155,7 @@ model Tools {
   description String?  @db.Text
   command     String
   args        Json     @default("[]")
+  /// [JSONSchema] JsonSchema
   envSchema   Json     @default("{}")
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

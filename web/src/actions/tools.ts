@@ -51,9 +51,7 @@ export const installTool = withUserAuth(async ({ organization, args }: AuthWrapp
     throw new Error('Tool not found');
   }
 
-  const envSchema = tool.envSchema as JSONSchema;
-
-  const validate = ajv.compile(envSchema);
+  const validate = ajv.compile(tool.envSchema);
   const isValid = validate(env);
 
   if (!isValid) {
