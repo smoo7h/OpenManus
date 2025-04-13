@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { verifyToken, getTokenFromHeader } from '@/lib/auth';
+import { verifyToken } from '@/lib/auth';
 
 // Add paths that don't require authentication
-const publicPaths = ['/login', '/signup', '/api/auth'];
+const publicPaths = ['/login', '/signup', '/api/auth', '/share', '/api/share'];
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;

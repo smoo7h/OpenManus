@@ -254,6 +254,25 @@ export const terminateTask = withUserAuth(async ({ organization, args }: AuthWra
   await prisma.tasks.update({ where: { id: taskId, organizationId: organization.id }, data: { status: 'terminated' } });
 });
 
+export const shareTask = withUserAuth(async ({ organization, args }: AuthWrapperContext<{ taskId: string; expiresAt: number }>) => {
+  const { taskId, expiresAt } = args;
+  const task = await prisma.tasks.findUnique({ where: { id: taskId, organizationId: organization.id } });
+  if (!task) throw new Error('Task not found');
+  await prisma.tasks.update({ where: { id: taskId }, data: { shareExpiresAt: new Date(expiresAt) } });
+});
+
+export const getSharedTask = async ({ taskId }: { taskId: string }) => {
+  const task = await prisma.tasks.findUnique({
+    where: { id: taskId },
+    include: { progresses: { orderBy: { index: 'asc' } } },
+  });
+  if (!task) throw new Error('Task not found');
+  if (task.shareExpiresAt && task.shareExpiresAt < new Date()) {
+    throw new Error('Task Share Link expired');
+  }
+  return { data: task, error: null };
+};
+
 // Handle event stream in background
 async function handleTaskEvents(taskId: string, outId: string, organizationId: string) {
   const streamResponse = await fetch(`${MANUS_URL}/tasks/${outId}/events`);

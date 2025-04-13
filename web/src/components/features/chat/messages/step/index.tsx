@@ -2,15 +2,35 @@ import { Badge } from '@/components/ui/badge';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Separator } from '@/components/ui/separator';
 import { cn, formatNumber } from '@/lib/utils';
-import { AggregatedMessage } from '@/types/chat';
+import { AggregatedMessage, Message } from '@/lib/chat-messages/types';
 
-export const StepMessage = ({ message }: { message: AggregatedMessage<'step'> }) => {
-  if (message.type !== 'step') return null;
+export const StepBadge = ({ message }: { message: AggregatedMessage & { type: 'agent:lifecycle:step' } }) => {
+  if (message.type !== 'agent:lifecycle:step') return null;
 
-  const stepStartMessage = message.messages.find(msg => msg.type === 'agent:step:start');
-  const stepCompleteMessage = message.messages.find(msg => msg.type === 'agent:step:complete');
-  const thinkTokenCountMessage = message.messages.find(msg => msg.type === 'agent:think:token:count');
-  const actTokenCountMessage = message.messages.find(msg => msg.type === 'agent:act:token:count');
+  // 在一个step中查找think和act消息
+  const thinkMessage = message.messages.find(msg => msg.type === 'agent:lifecycle:step:think') as
+    | (AggregatedMessage & { type: 'agent:lifecycle:step:think' })
+    | undefined;
+
+  const actMessage = message.messages.find(msg => msg.type === 'agent:lifecycle:step:act') as
+    | (AggregatedMessage & { type: 'agent:lifecycle:step:act' })
+    | undefined;
+
+  const stepStartMessage = message.messages.find(msg => msg.type === 'agent:lifecycle:step:start') as AggregatedMessage & {
+    type: 'agent:lifecycle:step:start';
+  };
+
+  const stepCompleteMessage = message?.messages.find(msg => msg.type === 'agent:lifecycle:step:complete') as AggregatedMessage & {
+    type: 'agent:lifecycle:step:complete';
+  };
+
+  const thinkTokenCountMessage = thinkMessage?.messages.find(msg => msg.type === 'agent:lifecycle:step:think:token:count') as AggregatedMessage & {
+    type: 'agent:lifecycle:step:think:token:count';
+  };
+
+  const actTokenCountMessage = actMessage?.messages.find(
+    (msg): msg is Message => 'type' in msg && msg.type === 'agent:lifecycle:step:act:token:count',
+  ) as AggregatedMessage & { type: 'agent:lifecycle:step:act:token:count' };
 
   const stepCount = stepStartMessage?.content.count || 0;
 
@@ -21,7 +41,7 @@ export const StepMessage = ({ message }: { message: AggregatedMessage<'step'> })
   const totalCompletion = (actTokenCountMessage ?? thinkTokenCountMessage)?.content.total_completion || 0;
 
   return (
-    <div className="text-muted-foreground mt-2 font-mono text-xs">
+    <div className="text-muted-foreground mt-2 mb-2 font-mono text-xs">
       <Popover>
         <PopoverTrigger asChild>
           <Badge

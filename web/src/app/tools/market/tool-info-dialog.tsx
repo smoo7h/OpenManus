@@ -1,11 +1,9 @@
+import { Markdown } from '@/components/block/markdown/markdown';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
-import Markdown from 'react-markdown';
-import rehypeRaw from 'rehype-raw';
-import remarkGfm from 'remark-gfm';
-import { ToolConfigDialog, ToolConfigDialogRef } from './tool-config-dialog';
 import { Tools } from '@prisma/client';
+import { forwardRef, useImperativeHandle, useRef, useState } from 'react';
+import { ToolConfigDialog, ToolConfigDialogRef } from './tool-config-dialog';
 
 export interface ToolInfoDialogRef {
   showInfo: (tool: Tools) => void;
@@ -42,23 +40,7 @@ export const ToolInfoDialog = forwardRef<ToolInfoDialogRef, ToolInfoDialogProps>
               </Button>
             </div>
           </DialogHeader>
-          <div className="markdown-body text-wrap">
-            <Markdown
-              remarkPlugins={[remarkGfm]}
-              rehypePlugins={[rehypeRaw]}
-              components={{
-                a: ({ href, children }) => {
-                  return (
-                    <a href={href} target="_blank" rel="noopener noreferrer">
-                      {children}
-                    </a>
-                  );
-                },
-              }}
-            >
-              {tool.description}
-            </Markdown>
-          </div>
+          <Markdown className="flex-1 overflow-auto">{tool.description}</Markdown>
         </DialogContent>
       </Dialog>
       <ToolConfigDialog ref={toolConfigDialogRef} onSuccess={props.onConfigSuccess} />

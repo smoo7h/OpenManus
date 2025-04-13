@@ -1,30 +1,27 @@
 'use client';
 
-import { getTask, restartTask, terminateTask } from '@/actions/tasks';
-import { ChatInput } from '@/components/features/chat/input';
+import { getSharedTask } from '@/actions/tasks';
 import { ChatMessages } from '@/components/features/chat/messages';
 import { ChatPreview } from '@/components/features/chat/preview';
 import { usePreviewData } from '@/components/features/chat/preview/store';
 import { aggregateMessages } from '@/lib/chat-messages';
-import { Message } from '@/lib/chat-messages/types';
-import { useParams, useRouter } from 'next/navigation';
+import { AggregatedMessage, Message } from '@/lib/chat-messages/types';
+import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 
-export default function ChatPage() {
+export default function ChatSharePage() {
   const params = useParams();
-  const router = useRouter();
   const taskId = params.taskid as string;
 
   const { setData: setPreviewData } = usePreviewData();
-
   const [isNearBottom, setIsNearBottom] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isThinking, setIsThinking] = useState(false);
-  const [isTerminating, setIsTerminating] = useState(false);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
+  const messagesQueueRef = useRef<Message[]>([]);
+  const timeoutIdRef = useRef<NodeJS.Timeout | null>(null);
 
-  const shouldAutoScroll = isNearBottom;
+  const shouldAutoScroll = true || isNearBottom;
 
   const handleScroll = () => {
     if (messagesContainerRef.current) {
@@ -40,16 +37,11 @@ export default function ChatPage() {
     }
   };
 
-  const refreshTask = async () => {
-    const res = await getTask({ taskId });
-    if (res.error || !res.data) {
-      console.error('Error fetching task:', res.error);
-      return;
-    }
-    setMessages(res.data.progresses.map(step => ({ ...step, index: step.index! || 0, type: step.type as any, role: 'assistant' as const })));
-    if (shouldAutoScroll) {
-      requestAnimationFrame(scrollToBottom);
-      const nextMessage = messages[messages.length - 1];
+  const processMessageQueue = () => {
+    if (messagesQueueRef.current.length > 0) {
+      const nextMessage = messagesQueueRef.current.shift();
+
+      setMessages(prevMessages => [...prevMessages, nextMessage!]);
       if (shouldAutoScroll) {
         if (nextMessage?.type === 'agent:lifecycle:step:think:browser:browse:complete') {
           setPreviewData({
@@ -63,24 +55,52 @@ export default function ChatPage() {
           setPreviewData({ type: 'tool', toolId: nextMessage.content.id });
         }
       }
+
+      if (messagesQueueRef.current.length > 0) {
+        timeoutIdRef.current = setTimeout(processMessageQueue, 300);
+      }
     }
-    setIsThinking(res.data!.status !== 'completed' && res.data!.status !== 'failed' && res.data!.status !== 'terminated');
-    setIsTerminating(res.data!.status === 'terminating');
+  };
+
+  const refreshTask = async () => {
+    const res = await getSharedTask({ taskId });
+    if (res.error || !res.data) {
+      console.error('Error fetching task:', res.error);
+      return;
+    }
+
+    setMessages([]);
+    if (timeoutIdRef.current) {
+      clearTimeout(timeoutIdRef.current);
+      timeoutIdRef.current = null;
+    }
+
+    messagesQueueRef.current = res.data.progresses.map(step => ({
+      ...step,
+      index: step.index! || 0,
+      type: step.type as any,
+      role: 'assistant' as const,
+    }));
+
+    if (messagesQueueRef.current.length > 0) {
+      timeoutIdRef.current = setTimeout(processMessageQueue, 500);
+    }
+
+    if (shouldAutoScroll) {
+      requestAnimationFrame(scrollToBottom);
+    }
   };
 
   useEffect(() => {
     if (!taskId) return;
     refreshTask();
-  }, [taskId]);
 
-  useEffect(() => {
-    refreshTask();
-    if (!taskId || !isThinking) return;
-    const interval = setInterval(refreshTask, 2000);
     return () => {
-      clearInterval(interval);
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      }
     };
-  }, [taskId, isThinking, shouldAutoScroll]);
+  }, [taskId]);
 
   useEffect(() => {
     if (shouldAutoScroll) {
@@ -93,21 +113,11 @@ export default function ChatPage() {
       if (abortControllerRef.current) {
         abortControllerRef.current.abort();
       }
+      if (timeoutIdRef.current) {
+        clearTimeout(timeoutIdRef.current);
+      }
     };
   }, []);
-
-  const handleSubmit = async (value: { prompt: string; tools: string[]; files: File[] }) => {
-    try {
-      const res = await restartTask({ taskId, prompt: value.prompt, tools: value.tools, files: value.files });
-      if (res.error) {
-        console.error('Error restarting task:', res.error);
-      }
-      setIsThinking(true);
-      router.refresh();
-    } catch (error) {
-      console.error('Error submitting task:', error);
-    }
-  };
 
   return (
     <div className="flex h-screen w-full flex-row justify-between">
@@ -124,15 +134,6 @@ export default function ChatPage() {
           >
             <ChatMessages messages={aggregateMessages(messages)} />
           </div>
-          <ChatInput
-            status={isThinking ? 'thinking' : isTerminating ? 'terminating' : 'completed'}
-            onSubmit={handleSubmit}
-            onTerminate={async () => {
-              await terminateTask({ taskId });
-              router.refresh();
-            }}
-            taskId={taskId}
-          />
         </div>
       </div>
       <div className="min-w-[800px] flex-1 items-center justify-center p-2">

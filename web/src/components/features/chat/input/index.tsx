@@ -2,25 +2,33 @@ import { confirm } from '@/components/block/confirm';
 import { ToolsConfigDialog, useSelectedTools } from '@/components/features/tools/tools-config-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Paperclip, PauseCircle, Rocket, Send, Wrench, X } from 'lucide-react';
-import { useRouter } from 'next/navigation';
+import { shareTask } from '@/actions/tasks';
+import { Paperclip, PauseCircle, Rocket, Send, Share2, Wrench, X } from 'lucide-react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
+import { toast } from 'sonner';
 
 interface ChatInputProps {
   status?: 'idle' | 'thinking' | 'terminating' | 'completed';
   onSubmit?: (value: { prompt: string; tools: string[]; files: File[] }) => Promise<void>;
   onTerminate?: () => Promise<void>;
+  taskId?: string;
 }
 
-export const ChatInput = ({ status = 'idle', onSubmit, onTerminate }: ChatInputProps) => {
+export const ChatInput = ({ status = 'idle', onSubmit, onTerminate, taskId }: ChatInputProps) => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [value, setValue] = useState('');
   const [files, setFiles] = useState<File[]>([]);
   const [toolsConfigDialogOpen, setToolsConfigDialogOpen] = useState(false);
+  const [shareDialogOpen, setShareDialogOpen] = useState(false);
+  const [shareExpiration, setShareExpiration] = useState('60');
+  const [isSharing, setIsSharing] = useState(false);
   const { selected: selectedTools, setSelected: setSelectedTools } = useSelectedTools();
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -75,11 +83,34 @@ export const ChatInput = ({ status = 'idle', onSubmit, onTerminate }: ChatInputP
     }
   };
 
+  const handleShareClick = () => {
+    setShareDialogOpen(true);
+  };
+
+  const handleShare = async () => {
+    if (!taskId) return;
+
+    setIsSharing(true);
+    try {
+      const daysToMs = parseInt(shareExpiration) * 24 * 60 * 60 * 1000;
+      const expiresAt = Date.now() + daysToMs;
+      await shareTask({ taskId, expiresAt });
+      navigator.clipboard.writeText(shareUrl);
+      toast.success('Share Link Copied');
+    } catch (error) {
+      console.error('Error sharing task:', error);
+    } finally {
+      setIsSharing(false);
+    }
+  };
+
+  const shareUrl = typeof window !== 'undefined' ? `${window.location.origin}/share/tasks/${taskId}` : '';
+
   return (
     <div className="pointer-events-none absolute right-0 bottom-0 left-0 p-4">
       <div className="pointer-events-auto mx-auto flex w-full max-w-2xl flex-col gap-2">
         {status !== 'idle' && (
-          <div className="flex justify-center">
+          <div className="flex justify-center gap-2">
             <Button
               variant="outline"
               className="flex cursor-pointer items-center gap-2 rounded-full"
@@ -89,6 +120,12 @@ export const ChatInput = ({ status = 'idle', onSubmit, onTerminate }: ChatInputP
               <Rocket className="h-4 w-4" />
               <span>New Task</span>
             </Button>
+            {taskId && status === 'completed' && (
+              <Button variant="outline" className="flex cursor-pointer items-center gap-2 rounded-full" type="button" onClick={handleShareClick}>
+                <Share2 className="h-4 w-4" />
+                <span>Share</span>
+              </Button>
+            )}
           </div>
         )}
         <div className="flex w-full flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.1)]">
@@ -163,6 +200,54 @@ export const ChatInput = ({ status = 'idle', onSubmit, onTerminate }: ChatInputP
         selected={selectedTools}
         onSelected={setSelectedTools}
       />
+
+      <Dialog open={shareDialogOpen} onOpenChange={setShareDialogOpen}>
+        <DialogContent
+          style={{ maxWidth: '600px' }}
+          onEscapeKeyDown={e => {
+            e.preventDefault();
+          }}
+          onOpenAutoFocus={e => {
+            e.preventDefault();
+            if (document.activeElement instanceof HTMLElement) {
+              document.activeElement.blur();
+            }
+          }}
+        >
+          <DialogHeader>
+            <DialogTitle>Share Task</DialogTitle>
+            <DialogDescription>Share this task</DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col gap-4 py-4">
+            <Input value={shareUrl} readOnly className="w-full" />
+
+            <div className="flex items-center gap-4">
+              <div className="flex-1">
+                <label htmlFor="expiration" className="mb-1 block text-sm text-gray-500">
+                  Duration
+                </label>
+                <Select value={shareExpiration} onValueChange={setShareExpiration}>
+                  <SelectTrigger id="expiration" className="w-full">
+                    <SelectValue placeholder="Select duration" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="7">7 days</SelectItem>
+                    <SelectItem value="30">30 days</SelectItem>
+                    <SelectItem value="60">60 days</SelectItem>
+                    <SelectItem value="180">180 days</SelectItem>
+                    <SelectItem value="365">365 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+          <DialogFooter className="flex justify-end">
+            <Button onClick={handleShare} disabled={isSharing}>
+              {isSharing ? 'Processing...' : 'Create Share Link and Copy'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

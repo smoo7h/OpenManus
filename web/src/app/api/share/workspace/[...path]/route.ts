@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyToken } from '@/lib/auth';
 import path from 'path';
 import fs from 'fs';
 import { prisma } from '@/lib/prisma';
@@ -14,38 +13,20 @@ import { prisma } from '@/lib/prisma';
 export async function GET(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   try {
     const { path } = await params;
-    const cookie = request.cookies.get('token');
-    if (!cookie) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-    const user = await verifyToken(cookie.value);
-    if (!user) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
-    const organizationUser = await prisma.organizationUsers.findFirst({
-      where: { userId: user.id },
-      select: { organizationId: true },
-    });
-    if (!organizationUser) {
-      return new NextResponse('Unauthorized', { status: 401 });
-    }
-
     const taskId = path[0];
 
     const task = await prisma.tasks.findUnique({
-      where: { id: taskId, organizationId: organizationUser.organizationId },
+      where: { id: taskId, shareExpiresAt: { gt: new Date() } },
     });
 
     if (!task) {
       return new NextResponse('Task not found', { status: 404 });
     }
 
-    const filePath = `${process.env.WORKSPACE_ROOT_PATH}/${organizationUser.organizationId}/${path.join('/')}`;
+    const filePath = `${process.env.WORKSPACE_ROOT_PATH}/${task.organizationId}/${path.join('/')}`;
     if (!fs.existsSync(filePath)) {
       return new NextResponse('File not found', { status: 404 });
     }
-
     const stats = fs.statSync(filePath);
     if (stats.isDirectory()) {
       const files = await fs.promises.readdir(filePath);

@@ -1,26 +1,21 @@
-import { Message, AggregatedMessage } from '@/types/chat';
-import Markdown from 'react-markdown';
+import { Markdown } from '@/components/block/markdown/markdown';
 import { Badge } from '@/components/ui/badge';
-import { ToolMessage } from './tools';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import '@/styles/animations.css';
-import { StepMessage } from './step';
+import { AggregatedMessage, Message } from '@/lib/chat-messages/types';
 import { formatNumber } from '@/lib/utils';
-
+import '@/styles/animations.css';
+import { StepBadge } from './step';
+import { ToolMessageContent } from './tools';
 interface ChatMessageProps {
-  messages: Message[];
+  messages: AggregatedMessage[];
 }
 
-const renderStartMessage = (message: Message<{ request: string }>) => (
-  <div className="markdown-body chat mt-2 rounded-md p-4">
-    <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-      {message.content.request}
-    </Markdown>
-  </div>
-);
+const UserMessage = ({ message }: { message: Message<{ request: string }> }) => <Markdown className="chat">{message.content.request}</Markdown>;
 
-const renderCompleteMessage = (message: Message<{ results: string[]; total_input_tokens: number; total_completion_tokens: number }>) => {
+interface CompletionMessageProps {
+  message: Message<{ results: string[]; total_input_tokens: number; total_completion_tokens: number }>;
+}
+
+const CompletionMessage = ({ message }: CompletionMessageProps) => {
   const showTokenCount = message.content.total_input_tokens || message.content.total_completion_tokens;
   return (
     <Badge className="cursor-pointer font-mono">
@@ -39,7 +34,11 @@ const renderCompleteMessage = (message: Message<{ results: string[]; total_input
   );
 };
 
-const renderTerminatedMessage = (message: Message) => {
+interface TerminatedMessageProps {
+  message: Message<{ total_input_tokens?: number; total_completion_tokens?: number }>;
+}
+
+const TerminatedMessage = ({ message }: TerminatedMessageProps) => {
   const showTokenCount = message.content.total_input_tokens || message.content.total_completion_tokens;
   return (
     <Badge className="cursor-pointer font-mono">
@@ -58,175 +57,119 @@ const renderTerminatedMessage = (message: Message) => {
   );
 };
 
-const renderToolSelectedMessage = (message: Message) => {
+const StepMessage = ({ message }: { message: AggregatedMessage & { type: 'agent:lifecycle:step' } }) => {
+  if (!('messages' in message)) return null;
+
+  const thinkMessage = message.messages.find(msg => msg.type === 'agent:lifecycle:step:think') as
+    | (AggregatedMessage & { type: 'agent:lifecycle:step:think' })
+    | undefined;
+
+  const toolSelectedMessage = thinkMessage?.messages.find(
+    (msg): msg is Message => 'type' in msg && msg.type === 'agent:lifecycle:step:think:tool:selected',
+  ) as (AggregatedMessage & { type: 'agent:lifecycle:step:think:tool:selected' }) | undefined;
+
   return (
-    <div className="container mx-auto max-w-4xl">
-      <div className="mb-2 flex items-center gap-2">
-        <div className="text-lg font-bold">✨ Manus</div>
-      </div>
-      {message.content.thoughts && (
-        <div className="markdown-body chat mt-2 rounded-md p-4 text-xs">
-          <Markdown remarkPlugins={[remarkGfm]} rehypePlugins={[rehypeRaw]}>
-            {message.content.thoughts}
-          </Markdown>
+    <div className="group mb-4 space-y-4">
+      {thinkMessage && (
+        <div className="space-y-2">
+          <div className="container mx-auto max-w-4xl">
+            <div className="mb-2 flex items-center justify-between">
+              <div className="text-lg font-bold">✨ Manus</div>
+              <div className="text-xs font-medium text-gray-500 italic opacity-0 transition-opacity duration-300 group-hover:opacity-100 hover:opacity-100">
+                {thinkMessage.createdAt
+                  ? new Date(thinkMessage.createdAt).toLocaleString('zh-CN', {
+                      year: 'numeric',
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                      second: '2-digit',
+                    })
+                  : ''}
+              </div>
+            </div>
+            <StepBadge message={message} />
+            <div className="flex flex-col gap-2 space-y-2">
+              {toolSelectedMessage?.content.thoughts && <Markdown className="chat">{toolSelectedMessage?.content.thoughts}</Markdown>}
+              <ToolMessageContent message={message} />
+            </div>
+          </div>
         </div>
       )}
     </div>
   );
 };
 
-/**
- * Aggregate tool messages into a single message with a list of tool calls
- *
- * a tool is started by a 'agent:tool:selected' message, and ends by a 'agent:tool:complete' message
- * a tool may be called multiple times, and each call is an 'agent:tool:start' and 'agent:tool:complete' message
- * a tool call timeline such as:
- *
- * agent:tool:selected (select 2 tools)
- *  |- agent:tool:start (start tool 1)
- *    |- agent:tool:execute:start (1)
- *    |- agent:tool:execute:complete (1)
- *  |- agent:tool:complete (complete tool 1)
- *  |- agent:tool:start (start tool 2)
- *    |- agent:tool:execute:start (2)
- *    |- agent:tool:execute:complete (2)
- *  |- agent:tool:complete (complete tool 2)
- *
- * @param messages
- * @returns
- */
-const aggregateMessages = (messages: Message[]): AggregatedMessage[] => {
-  const result = messages.reduce((acc, current) => {
-    // Aggregate Tool Messages
-    if (['agent:tool:start'].includes(current.type!)) {
-      // need to create a new aggregatec message
-      acc.push({ ...current, role: 'assistant', type: 'tool', messages: [current] });
-      return acc;
-    }
-    if (
-      [
-        'agent:tool:execute:start',
-        'agent:tool:execute:complete',
-        'agent:tool:complete',
-        'agent:tool:error',
-        'agent:browser:browse:start',
-        'agent:browser:browse:complete',
-      ].includes(current.type!)
-    ) {
-      // find the nearest agent:tool:start from the end
-      const selectedMessage = acc.findLast(msg => msg.type === 'tool');
-      if (selectedMessage) {
-        (selectedMessage as { messages: Message[] }).messages.push(current);
-      }
-      return acc;
-    }
+const LifecycleMessage = ({ message }: { message: AggregatedMessage }) => {
+  if (!('messages' in message)) return null;
 
-    // Aggregate Step Messages
-    if (['agent:step:start'].includes(current.type!)) {
-      // need to create a new aggregatec message
-      acc.push({ ...current, role: 'assistant', type: 'step', messages: [current] });
-      return acc;
-    }
-    if (
-      [
-        'agent:think:start',
-        'agent:think:token:count',
-        'agent:think:complete',
-        'agent:act:start',
-        'agent:act:token:count',
-        'agent:act:complete',
-        'agent:step:complete',
-      ].includes(current.type!)
-    ) {
-      // find the nearest agent:step:start from the end
-      const selectedMessage = acc.findLast(msg => msg.type === 'step');
-      if (selectedMessage) {
-        (selectedMessage as { messages: Message[] }).messages.push(current);
-      }
-      return acc;
-    }
+  return (
+    <div className="space-y-4">
+      {message.messages.map((msg, index) => {
+        if (!('type' in msg)) return null;
 
-    acc.push(current);
-    return acc;
-  }, [] as AggregatedMessage[]);
+        // 处理生命周期开始
+        if (msg.type === 'agent:lifecycle:start') {
+          return (
+            <div key={index} className="container mx-auto flex max-w-4xl justify-end">
+              <UserMessage message={msg as Message<{ request: string }>} />
+            </div>
+          );
+        }
 
-  // if step is last, add a thinking status to the last step
-  // expect agent:browser:browse:start, it would be blocked at the first step for a while
-  const list = result.filter(
-    msg =>
-      !(
-        msg.type === 'agent:browser:browse:start' ||
-        (msg.type === 'agent:browser:browse:error' && msg.content.error === 'Browser context not initialized')
-      ),
+        // 处理生命周期完成
+        if (msg.type === 'agent:lifecycle:complete') {
+          return (
+            <div key={index} className="container mx-auto max-w-4xl">
+              <CompletionMessage message={msg as Message<{ results: string[]; total_input_tokens: number; total_completion_tokens: number }>} />
+            </div>
+          );
+        }
+
+        // 处理生命周期终止
+        if (msg.type === 'agent:lifecycle:terminated') {
+          return (
+            <div key={index} className="container mx-auto max-w-4xl">
+              <TerminatedMessage message={msg} />
+            </div>
+          );
+        }
+
+        // 处理步骤消息
+        if (msg.type === 'agent:lifecycle:step') {
+          return (
+            <div key={index} className="container mx-auto max-w-4xl">
+              <StepMessage message={msg as AggregatedMessage & { type: 'agent:lifecycle:step' }} />
+            </div>
+          );
+        }
+
+        return null;
+      })}
+    </div>
   );
-  const lastStep = list[list.length - 1];
-  if (lastStep?.type === 'agent:step:start') {
-    lastStep.content.thinking = true;
-  }
-
-  return result;
 };
 
-const ChatMessage = (props: { message: AggregatedMessage }) => {
-  const { message } = props;
-  if (message.type === 'agent:lifecycle:start') {
+const ChatMessage = ({ message }: { message: AggregatedMessage }) => {
+  if (!message.type?.startsWith('agent:lifecycle')) {
     return (
-      <div className="first:pt-0">
-        <div className="container mx-auto flex max-w-4xl justify-end">{renderStartMessage(message)}</div>
+      <div className="container mx-auto max-w-4xl">
+        <Markdown>{message.content}</Markdown>
       </div>
     );
   }
-  if (message.type === 'agent:lifecycle:complete') {
-    return (
-      <div className="first:pt-0">
-        <div className="container mx-auto max-w-4xl">{renderCompleteMessage(message)}</div>
-      </div>
-    );
-  }
-  if (message.type === 'agent:lifecycle:terminated') {
-    return (
-      <div className="first:pt-0">
-        <div className="container mx-auto max-w-4xl">{renderTerminatedMessage(message)}</div>
-      </div>
-    );
-  }
-  if (message.type === 'agent:tool:selected') {
-    return (
-      <div className="first:pt-0">
-        <div className="container mx-auto max-w-4xl">{renderToolSelectedMessage(message)}</div>
-      </div>
-    );
-  }
-  if (message.type === 'tool') {
-    return (
-      <div className="first:pt-0">
-        <div className="container mx-auto max-w-4xl">
-          <ToolMessage message={message as AggregatedMessage<'tool'>} />
-        </div>
-      </div>
-    );
-  }
-  if (message.type === 'step') {
-    return (
-      <div className="first:pt-0">
-        <div className="container mx-auto max-w-4xl">
-          <StepMessage message={message as AggregatedMessage<'step'>} />
-        </div>
-      </div>
-    );
-  }
-  return null;
+
+  return <LifecycleMessage message={message} />;
 };
 
 export const ChatMessages = ({ messages = [] }: ChatMessageProps) => {
-  const m = aggregateMessages(messages.map((msg, index) => ({ ...msg, index })));
-  return m
-    .map(message => {
-      return (
-        <div key={message.index}>
+  return (
+    <div className="space-y-4">
+      {messages.map((message, index) => (
+        <div key={message.index || index} className="first:pt-0">
           <ChatMessage message={message} />
         </div>
-      );
-    })
-    .filter(Boolean);
+      ))}
+    </div>
+  );
 };

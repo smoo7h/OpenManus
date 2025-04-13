@@ -69,6 +69,7 @@ model Tasks {
   updatedAt      DateTime         @updatedAt
   organizationId String
   tools          Json             @default("[]")
+  shareExpiresAt DateTime?
   steps          TaskProcesses[]
   progresses     TaskProgresses[]
 
