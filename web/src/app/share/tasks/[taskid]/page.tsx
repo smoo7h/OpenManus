@@ -5,7 +5,7 @@ import { ChatMessages } from '@/components/features/chat/messages';
 import { ChatPreview } from '@/components/features/chat/preview';
 import { usePreviewData } from '@/components/features/chat/preview/store';
 import { aggregateMessages } from '@/lib/chat-messages';
-import { AggregatedMessage, Message } from '@/lib/chat-messages/types';
+import { Message } from '@/lib/chat-messages/types';
 import { useParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 

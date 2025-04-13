@@ -423,12 +423,8 @@ class ToolCallContextHelper:
                     "id": command_id,
                     "name": name,
                     "args": args,
-                    "result": (
-                        result.output
-                        if isinstance(result.output, str)
-                        else json.dumps(result.output)
-                    ),
-                    "error": result.error,
+                    "result": (result if isinstance(result, str) else str(result)),
+                    "error": result.error if hasattr(result, "error") else None,
                 },
             )
             # Handle special tools
