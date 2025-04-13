@@ -44,6 +44,7 @@ services:
       - PORT=3010
       - WORKSPACE_ROOT_PATH=/workspace
     env_file:
+      # 指定环境变量文件，参考 .env.example 文件
       - .env
     depends_on:
       - openmanus-core
