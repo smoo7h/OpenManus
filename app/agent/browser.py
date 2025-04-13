@@ -26,9 +26,9 @@ if TYPE_CHECKING:
 
 class BrowserAgentEvents(ToolCallAgentEvents):
     # Browser events
-    BROWSER_BROWSER_USE_START = "agent:browser:browse:start"
-    BROWSER_BROWSER_USE_COMPLETE = "agent:browser:browse:complete"
-    BROWSER_BROWSER_USE_ERROR = "agent:browser:browse:error"
+    BROWSER_BROWSER_USE_START = "agent:lifecycle:step:think:browser:browse:start"
+    BROWSER_BROWSER_USE_COMPLETE = "agent:lifecycle:step:think:browser:browse:complete"
+    BROWSER_BROWSER_USE_ERROR = "agent:lifecycle:step:think:browser:browse:error"
 
 
 class BrowserContextHelper:

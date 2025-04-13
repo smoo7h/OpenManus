@@ -47,26 +47,23 @@ class EventPattern:
     # Event constants
 
 
+BASE_AGENT_EVENTS_PREFIX = "agent:lifecycle"
+
+
 class BaseAgentEvents:
     # Lifecycle events
-    LIFECYCLE_START = "agent:lifecycle:start"
-    LIFECYCLE_COMPLETE = "agent:lifecycle:complete"
-    LIFECYCLE_TERMINATING = "agent:lifecycle:terminating"
-    LIFECYCLE_TERMINATED = "agent:lifecycle:terminated"
-
+    LIFECYCLE_START = f"{BASE_AGENT_EVENTS_PREFIX}:start"
+    LIFECYCLE_COMPLETE = f"{BASE_AGENT_EVENTS_PREFIX}:complete"
+    LIFECYCLE_TERMINATING = f"{BASE_AGENT_EVENTS_PREFIX}:terminating"
+    LIFECYCLE_TERMINATED = f"{BASE_AGENT_EVENTS_PREFIX}:terminated"
     # State events
-    STATE_CHANGE = "agent:state:change"
-    STATE_STUCK_DETECTED = "agent:state:stuck:detected"
-    STATE_STUCK_HANDLED = "agent:state:stuck:handled"
-
+    STATE_CHANGE = f"{BASE_AGENT_EVENTS_PREFIX}:state:change"
+    STATE_STUCK_DETECTED = f"{BASE_AGENT_EVENTS_PREFIX}:state:stuck_detected"
+    STATE_STUCK_HANDLED = f"{BASE_AGENT_EVENTS_PREFIX}:state:stuck_handled"
     # Step events
-    STEP_START = "agent:step:start"
-    STEP_COMPLETE = "agent:step:complete"
-    STEP_ERROR = "agent:step:error"
-    STEP_MAX_REACHED = "agent:step:max_reached"
-
+    STEP_MAX_REACHED = f"{BASE_AGENT_EVENTS_PREFIX}:step_max_reached"
     # Memory events
-    MEMORY_ADDED = "agent:memory:added"
+    MEMORY_ADDED = f"{BASE_AGENT_EVENTS_PREFIX}:memory:added"
 
 
 class EventQueue:
@@ -438,11 +435,6 @@ class BaseAgent(BaseModel, ABC):
         return decorator
 
     @abstractmethod
-    @event_wrapper(
-        BaseAgentEvents.STEP_START,
-        BaseAgentEvents.STEP_COMPLETE,
-        BaseAgentEvents.STEP_ERROR,
-    )
     async def step(self) -> str:
         """Execute a single step in the agent's workflow.
 

@@ -7,16 +7,25 @@ from app.agent.base import BaseAgent, BaseAgentEvents
 from app.llm import LLM
 from app.schema import AgentState, Memory
 
+REACT_AGENT_EVENTS_PREFIX = "agent:lifecycle:step"
+REACT_AGENT_EVENTS_THINK_PREFIX = "agent:lifecycle:step:think"
+REACT_AGENT_EVENTS_ACT_PREFIX = "agent:lifecycle:step:act"
+
 
 class ReActAgentEvents(BaseAgentEvents):
-    THINK_START = "agent:think:start"
-    THINK_COMPLETE = "agent:think:complete"
-    THINK_ERROR = "agent:think:error"
-    THINK_TOKEN_COUNT = "agent:think:token:count"
-    ACT_START = "agent:act:start"
-    ACT_COMPLETE = "agent:act:complete"
-    ACT_ERROR = "agent:act:error"
-    ACT_TOKEN_COUNT = "agent:act:token:count"
+    STEP_START = f"{REACT_AGENT_EVENTS_PREFIX}:start"
+    STEP_COMPLETE = f"{REACT_AGENT_EVENTS_PREFIX}:complete"
+    STEP_ERROR = f"{REACT_AGENT_EVENTS_PREFIX}:error"
+
+    THINK_START = f"{REACT_AGENT_EVENTS_THINK_PREFIX}:start"
+    THINK_COMPLETE = f"{REACT_AGENT_EVENTS_THINK_PREFIX}:complete"
+    THINK_ERROR = f"{REACT_AGENT_EVENTS_THINK_PREFIX}:error"
+    THINK_TOKEN_COUNT = f"{REACT_AGENT_EVENTS_THINK_PREFIX}:token:count"
+
+    ACT_START = f"{REACT_AGENT_EVENTS_ACT_PREFIX}:start"
+    ACT_COMPLETE = f"{REACT_AGENT_EVENTS_ACT_PREFIX}:complete"
+    ACT_ERROR = f"{REACT_AGENT_EVENTS_ACT_PREFIX}:error"
+    ACT_TOKEN_COUNT = f"{REACT_AGENT_EVENTS_ACT_PREFIX}:token:count"
 
 
 class ReActAgent(BaseAgent, ABC):

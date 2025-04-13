@@ -23,13 +23,18 @@ if TYPE_CHECKING:
 TOOL_CALL_REQUIRED = "Tool calls required but none provided"
 
 
+TOOL_CALL_THINK_AGENT_EVENTS_PREFIX = "agent:lifecycle:step:think:tool"
+TOOL_CALL_ACT_AGENT_EVENTS_PREFIX = "agent:lifecycle:step:act:tool"
+
+
 class ToolCallAgentEvents(BaseAgentEvents):
-    TOOL_START = "agent:tool:start"
-    TOOL_COMPLETE = "agent:tool:complete"
-    TOOL_ERROR = "agent:tool:error"
-    TOOL_SELECTED = "agent:tool:selected"
-    TOOL_EXECUTE_START = "agent:tool:execute:start"
-    TOOL_EXECUTE_COMPLETE = "agent:tool:execute:complete"
+    TOOL_SELECTED = f"{TOOL_CALL_THINK_AGENT_EVENTS_PREFIX}:selected"
+
+    TOOL_START = f"{TOOL_CALL_ACT_AGENT_EVENTS_PREFIX}:start"
+    TOOL_COMPLETE = f"{TOOL_CALL_ACT_AGENT_EVENTS_PREFIX}:complete"
+    TOOL_ERROR = f"{TOOL_CALL_ACT_AGENT_EVENTS_PREFIX}:error"
+    TOOL_EXECUTE_START = f"{TOOL_CALL_ACT_AGENT_EVENTS_PREFIX}:execute:start"
+    TOOL_EXECUTE_COMPLETE = f"{TOOL_CALL_ACT_AGENT_EVENTS_PREFIX}:execute:complete"
 
 
 class MCPToolCallExtension:
@@ -401,24 +406,29 @@ class ToolCallContextHelper:
             return f"Error: Unknown tool '{name}'"
 
         try:
+            command_id = command.id
             # Parse arguments
             args = json.loads(command.function.arguments or "{}")
 
             # Execute the tool
             logger.info(f"🔧 Activating tool: '{name}'...")
             self.agent.emit(
-                ToolCallAgentEvents.TOOL_EXECUTE_START, {"name": name, "args": args}
+                ToolCallAgentEvents.TOOL_EXECUTE_START,
+                {"id": command_id, "name": name, "args": args},
             )
             result = await self.available_tools.execute(name=name, tool_input=args)
             self.agent.emit(
                 ToolCallAgentEvents.TOOL_EXECUTE_COMPLETE,
                 {
+                    "id": command_id,
                     "name": name,
+                    "args": args,
                     "result": (
-                        result.model_dump()
-                        if isinstance(result, BaseModel)
-                        else str(result)
+                        result.output
+                        if isinstance(result.output, str)
+                        else json.dumps(result.output)
                     ),
+                    "error": result.error,
                 },
             )
             # Handle special tools
@@ -450,10 +460,18 @@ class ToolCallContextHelper:
             logger.error(
                 f"📝 Oops! The arguments for '{name}' don't make sense - invalid JSON, arguments:{command.function.arguments}"
             )
+            self.agent.emit(
+                ToolCallAgentEvents.TOOL_EXECUTE_COMPLETE,
+                {"id": command.id, "name": name, "args": args, "error": error_msg},
+            )
             return f"Error: {error_msg}"
         except Exception as e:
             error_msg = f"⚠️ Tool '{name}' encountered a problem: {str(e)}"
             logger.exception(error_msg)
+            self.agent.emit(
+                ToolCallAgentEvents.TOOL_EXECUTE_COMPLETE,
+                {"id": command.id, "name": name, "args": args, "error": error_msg},
+            )
             return f"Error: {error_msg}"
 
     async def handle_special_tool(self, name: str, result: Any, **kwargs):
