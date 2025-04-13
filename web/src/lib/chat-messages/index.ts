@@ -121,7 +121,7 @@ class ChatMessageAggregator {
 
         // Handle browser messages
         if (message.type?.includes(':browser:')) {
-          if (message.type === 'agent:lifecycle:step:act:browser:browse:start') {
+          if (message.type === 'agent:lifecycle:step:think:browser:browse:complete') {
             currentBrowser = {
               ...message,
               type: 'agent:lifecycle:step:act:browser',

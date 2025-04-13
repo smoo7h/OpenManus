@@ -10,9 +10,9 @@ import archiver from 'archiver';
  * @param params
  * @returns
  */
-export async function GET(request: NextRequest, { params }: { params: { path: string[] } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ path: string[] }> }) {
   try {
-    const { path } = params;
+    const { path } = await params;
     const cookie = request.cookies.get('token');
     if (!cookie) {
       return new NextResponse('Unauthorized', { status: 401 });

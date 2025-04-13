@@ -57,7 +57,7 @@ export default function ChatSharePage() {
       }
 
       if (messagesQueueRef.current.length > 0) {
-        timeoutIdRef.current = setTimeout(processMessageQueue, 300);
+        timeoutIdRef.current = setTimeout(processMessageQueue, 200);
       }
     }
   };
