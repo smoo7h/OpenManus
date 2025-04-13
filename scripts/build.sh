@@ -10,7 +10,7 @@ if [ $# -gt 1 ]; then
     exit 1
 fi
 
-VERSION=${1:-"latest"}
+VERSION=${1}
 CORE_IMAGE="iheytang/openmanus-core:${VERSION}"
 WEB_IMAGE="iheytang/openmanus-web:${VERSION}"
 ALIYUN_REGISTRY="registry.cn-hangzhou.aliyuncs.com/iheytang"
