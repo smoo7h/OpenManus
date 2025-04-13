@@ -64,7 +64,7 @@ class MCPSandboxClients(ToolCollection):
         # Always create a new container but use cached images
         # Generate a container name with timestamp to ensure uniqueness
         timestamp = int(time.time())
-        container_name = f"openmanus-sandbox-{self.client_id}-{timestamp}-{self.name}"
+        container_name = f"openmanus-sandbox-{timestamp}-{self.client_id}"
         self.container_name = container_name
 
     def _get_command_type(self, command: str) -> str:

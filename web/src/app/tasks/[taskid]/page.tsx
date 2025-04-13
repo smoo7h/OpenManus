@@ -69,6 +69,7 @@ export default function ChatPage() {
   };
 
   useEffect(() => {
+    setPreviewData(null);
     if (!taskId) return;
     refreshTask();
   }, [taskId]);
