@@ -8,9 +8,11 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { shareTask } from '@/actions/tasks';
 import { Paperclip, PauseCircle, Rocket, Send, Share2, Wrench, X } from 'lucide-react';
-import { usePathname, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useRef, useState } from 'react';
 import { toast } from 'sonner';
+import { useConfigDialog } from '../../config/config-dialog';
+import { useLlmConfig } from '../../config/config-llm';
 
 interface ChatInputProps {
   status?: 'idle' | 'thinking' | 'terminating' | 'completed';
@@ -21,6 +23,10 @@ interface ChatInputProps {
 
 export const ChatInput = ({ status = 'idle', onSubmit, onTerminate, taskId }: ChatInputProps) => {
   const router = useRouter();
+
+  const { config, loading } = useLlmConfig();
+  const { show: showConfig } = useConfigDialog();
+
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [value, setValue] = useState('');
@@ -55,6 +61,10 @@ export const ChatInput = ({ status = 'idle', onSubmit, onTerminate, taskId }: Ch
   };
 
   const handleSendClick = async () => {
+    if (!config) {
+      showConfig();
+      return;
+    }
     if (status === 'thinking' || status === 'terminating') {
       confirm({
         content: (
@@ -128,12 +138,20 @@ export const ChatInput = ({ status = 'idle', onSubmit, onTerminate, taskId }: Ch
             )}
           </div>
         )}
+        {!config && loading === false && (
+          <div className="flex justify-center">
+            <Button variant="outline" className="flex cursor-pointer items-center gap-2 rounded-full" type="button" onClick={showConfig}>
+              <Wrench className="h-4 w-4" />
+              <span>Please configure your LLM model first</span>
+            </Button>
+          </div>
+        )}
         <div className="flex w-full flex-col rounded-2xl bg-white shadow-[0_0_15px_rgba(0,0,0,0.1)]">
           <Textarea
             value={value}
             onChange={e => setValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            disabled={status === 'thinking' || status === 'terminating'}
+            disabled={status === 'thinking' || status === 'terminating' || !config}
             placeholder={
               status === 'thinking'
                 ? 'Thinking...'
@@ -173,6 +191,7 @@ export const ChatInput = ({ status = 'idle', onSubmit, onTerminate, taskId }: Ch
                 size="icon"
                 variant="ghost"
                 className="h-8 w-8 cursor-pointer rounded-xl hover:bg-gray-100"
+                disabled={!config}
                 onClick={triggerFileSelect}
                 aria-label="Attach files"
               >
@@ -185,7 +204,7 @@ export const ChatInput = ({ status = 'idle', onSubmit, onTerminate, taskId }: Ch
                 variant="ghost"
                 className="h-8 w-8 cursor-pointer rounded-xl hover:bg-gray-100"
                 onClick={handleSendClick}
-                disabled={status !== 'idle' && status !== 'completed' && !(status === 'thinking' || status === 'terminating')}
+                disabled={status !== 'idle' && status !== 'completed' && !(status === 'thinking' || status === 'terminating') && !config}
                 aria-label={status === 'thinking' || status === 'terminating' ? 'Terminate task' : 'Send message'}
               >
                 {status === 'thinking' || status === 'terminating' ? <PauseCircle className="h-4 w-4" /> : <Send className="h-4 w-4" />}

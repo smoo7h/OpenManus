@@ -140,7 +140,7 @@ def parse_tools(tools: list[str]) -> list[Union[str, McpToolConfig]]:
 async def create_task(
     task_id: str = Form(...),
     prompt: str = Form(...),
-    tools: list[str] = Form(...),
+    tools: Optional[list[str]] = Form(None),
     preferences: Optional[str] = Form(None),
     llm_config: Optional[str] = Form(None),
     files: Optional[List[UploadFile]] = File(None),
@@ -164,7 +164,7 @@ async def create_task(
                 status_code=400, detail=f"Invalid llm_config format: {str(e)}"
             )
 
-    processed_tools = parse_tools(tools)
+    processed_tools = parse_tools(tools or [])
 
     task = task_manager.create_task(
         task_id,
@@ -256,11 +256,11 @@ async def get_tasks():
 async def restart_task(
     task_id: str = Form(...),
     prompt: str = Form(...),
-    tools: list[str] = Form(...),
+    tools: Optional[list[str]] = Form(None),
     preferences: Optional[str] = Form(None),
     llm_config: Optional[str] = Form(None),
     history: Optional[str] = Form(None),
-    files: list[UploadFile] = Form([]),
+    files: Optional[list[UploadFile]] = Form(None),
 ):
     """Restart a task."""
     # Parse JSON strings
@@ -289,7 +289,7 @@ async def restart_task(
         except json.JSONDecodeError:
             raise HTTPException(status_code=400, detail="Invalid history JSON format")
 
-    processed_tools = parse_tools(tools)
+    processed_tools = parse_tools(tools or [])
 
     if task_id in task_manager.tasks:
         task = task_manager.tasks[task_id]

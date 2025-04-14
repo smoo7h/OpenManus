@@ -1,23 +1,11 @@
 'use client';
 
-import { getLlmConfig } from '@/actions/config';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { cn } from '@/lib/utils';
-import { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+import { useState } from 'react';
 import { create } from 'zustand';
 import ConfigLlm from './config-llm';
 import ConfigPreferences from './config-preferences';
-
-interface ConfigFormData {
-  model: string;
-  apiKey: string;
-  baseUrl: string;
-  maxTokens: number;
-  temperature: number;
-  apiType: string;
-}
 
 export const useConfigDialog = create<{ open: boolean; show: () => void; hide: () => void }>(set => ({
   open: false,
@@ -29,69 +17,6 @@ export default function ConfigDialog() {
   const { open, show, hide } = useConfigDialog();
 
   const [currentTab, setCurrentTab] = useState<'llm' | 'preferences'>('llm');
-
-  const form = useForm<ConfigFormData>({
-    defaultValues: {
-      model: 'gpt-4',
-      apiKey: '',
-      baseUrl: 'https://api.openai.com/v1',
-      maxTokens: 2000,
-      temperature: 0.7,
-      apiType: 'openai',
-    },
-    resolver: async data => {
-      const errors: any = {};
-
-      if (!data.model) {
-        errors.model = {
-          type: 'required',
-          message: 'Model is required',
-        };
-      }
-
-      if (!data.apiKey) {
-        errors.apiKey = {
-          type: 'required',
-          message: 'API Key is required',
-        };
-      }
-
-      if (!data.baseUrl) {
-        errors.baseUrl = {
-          type: 'required',
-          message: 'Base URL is required',
-        };
-      }
-
-      return {
-        values: data,
-        errors,
-      };
-    },
-  });
-
-  useEffect(() => {
-    const loadConfig = async () => {
-      try {
-        const config = await getLlmConfig({});
-        if (config) {
-          form.reset({
-            model: config.data?.model || 'deepseek-chat',
-            apiKey: config.data?.apiKey || '',
-            baseUrl: config.data?.baseUrl || 'https://api.deepseek.com/v1',
-            maxTokens: config.data?.maxTokens || 8192,
-            temperature: config.data?.temperature || 0.5,
-            apiType: '',
-          });
-        }
-      } catch (error) {
-        toast.error('Failed to load configuration');
-      }
-    };
-    if (open) {
-      loadConfig();
-    }
-  }, [open, form]);
 
   return (
     <Dialog open={open} onOpenChange={open => (open ? show() : hide())}>
