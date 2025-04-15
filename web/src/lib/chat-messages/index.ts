@@ -47,6 +47,7 @@ class ChatMessageAggregator {
 
       // Handle top-level lifecycle messages
       if (
+        message.type === 'agent:lifecycle:plan' ||
         message.type === 'agent:lifecycle:complete' ||
         message.type === 'agent:lifecycle:terminated' ||
         message.type === 'agent:lifecycle:memory:added' ||

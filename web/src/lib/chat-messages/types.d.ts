@@ -33,6 +33,7 @@ type AgentLifecycleStepType =
 type AgentLifecycleType =
   | AgentLifecycleStepType
   | 'agent:lifecycle:start'
+  | 'agent:lifecycle:plan'
   | 'agent:lifecycle:memory:added'
   | 'agent:lifecycle:state:change'
   | 'agent:lifecycle:complete'
