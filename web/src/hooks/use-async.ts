@@ -1,6 +1,7 @@
-import { AuthAction, AuthWrapper } from '@/lib/auth-wrapper';
+import { AuthAction } from '@/lib/auth-wrapper';
 import { DependencyList, useCallback, useEffect, useRef, useState } from 'react';
 import { create } from 'zustand';
+import { isEqual } from 'lodash';
 
 type CacheStore = {
   caches: Map<boolean | string | Symbol, any>;
@@ -32,23 +33,31 @@ export const useAsync = <R, T extends unknown[]>(
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
   const fnRef = useRef(fn);
+  const paramsRef = useRef(params);
   const { getCache, setCache } = useCacheStore();
 
   const cacheKey = options.cache || false;
 
   useEffect(() => {
-    if (options.cache && !options.manual) {
+    if (cacheKey && !options.manual) {
       const cachedData = getCache<R>(cacheKey);
       if (cachedData !== undefined) {
         setData(cachedData);
       }
     }
-  }, [cacheKey, options.cache, options.manual]);
+  }, [cacheKey, options.manual]);
 
   // Update function reference without triggering re-renders
   useEffect(() => {
     fnRef.current = fn;
   }, [fn]);
+
+  // Deep compare params to prevent unnecessary re-renders
+  useEffect(() => {
+    if (!isEqual(paramsRef.current, params)) {
+      paramsRef.current = params;
+    }
+  }, [params]);
 
   const shouldSkip = options.skip ? options.skip(params) : false;
   const run = useCallback(
@@ -62,7 +71,7 @@ export const useAsync = <R, T extends unknown[]>(
         const result = await fnRef.current(...runParams);
         setData(result);
 
-        if (options.cache) {
+        if (cacheKey) {
           setCache<R>(cacheKey, result);
         }
 
@@ -74,12 +83,12 @@ export const useAsync = <R, T extends unknown[]>(
         setIsLoading(false);
       }
     },
-    [shouldSkip, cacheKey, options.cache, ...(options.deps ?? [])],
+    [shouldSkip, cacheKey, ...(options.deps ?? [])],
   );
 
   const refresh = useCallback(() => {
-    return run(...params);
-  }, [run, ...params]);
+    return run(...paramsRef.current);
+  }, [run]);
 
   const mutate = useCallback(
     (dataAction: R | undefined | ((prev: R | undefined) => R)) => {
@@ -87,13 +96,13 @@ export const useAsync = <R, T extends unknown[]>(
       setData(newData);
       setError(undefined);
 
-      if (options.cache && newData !== undefined) {
+      if (cacheKey && newData !== undefined) {
         setCache<R>(cacheKey, newData);
       }
 
       return newData;
     },
-    [data, cacheKey, options.cache],
+    [data, cacheKey],
   );
 
   useEffect(() => {
@@ -101,15 +110,15 @@ export const useAsync = <R, T extends unknown[]>(
       return;
     }
 
-    if (options.cache) {
+    if (cacheKey) {
       const cachedData = getCache<R>(cacheKey);
       if (cachedData !== undefined) {
         setData(cachedData);
         return;
       }
     }
-    run(...params);
-  }, [run, options.manual, options.cache, cacheKey, ...params]);
+    run(...paramsRef.current);
+  }, [run, options.manual, cacheKey]);
 
   return { data, isLoading, error, run, refresh, mutate };
 };

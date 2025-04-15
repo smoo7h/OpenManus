@@ -4,7 +4,7 @@ import { Label } from '@/components/ui/label';
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { getLlmConfig, updateLlmConfig } from '@/actions/config';
 import { toast } from 'sonner';
 import { Form, FormField } from '@/components/ui/form';
@@ -23,6 +23,7 @@ import {
 import { DialogDescription } from '@/components/ui/dialog';
 import { DialogTitle } from '@/components/ui/dialog';
 import { DialogHeader } from '@/components/ui/dialog';
+import { create } from 'zustand';
 
 interface ConfigFormData {
   model: string;
@@ -33,17 +34,47 @@ interface ConfigFormData {
   apiType: string;
 }
 
+const useLlmConfigStore = create<{ config: ConfigFormData | null; setConfig: (config: ConfigFormData) => void }>(set => ({
+  config: null,
+  setConfig: (config: ConfigFormData) => set({ config }),
+}));
+
+export const useLlmConfig = () => {
+  const [loading, setLoading] = useState(true);
+  const { config, setConfig } = useLlmConfigStore();
+
+  const refreshConfig = useCallback(async () => {
+    setLoading(true);
+    const c = await getLlmConfig({});
+    if (c && c.data) {
+      setConfig(c.data);
+    }
+    setLoading(false);
+  }, [setConfig]);
+
+  useEffect(() => {
+    const loadConfig = async () => {
+      await refreshConfig();
+    };
+    loadConfig();
+  }, []);
+
+  return { config, loading, refreshConfig };
+};
+
 export default function ConfigLlm(props: { onSuccess?: (success: boolean) => void }) {
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [pendingData, setPendingData] = useState<ConfigFormData | null>(null);
 
+  const { config, refreshConfig } = useLlmConfig();
+
   const form = useForm<ConfigFormData>({
     defaultValues: {
-      model: 'gpt-4',
+      model: 'deepseek-chat',
       apiKey: '',
-      baseUrl: 'https://api.openai.com/v1',
-      maxTokens: 2000,
+      baseUrl: 'https://api.deepseek.com/v1',
+      maxTokens: 8192,
       temperature: 0.7,
       apiType: 'openai',
     },
@@ -81,14 +112,13 @@ export default function ConfigLlm(props: { onSuccess?: (success: boolean) => voi
   useEffect(() => {
     const loadConfig = async () => {
       try {
-        const config = await getLlmConfig({});
         if (config) {
           form.reset({
-            model: config.data?.model || 'deepseek-chat',
-            apiKey: config.data?.apiKey || '',
-            baseUrl: config.data?.baseUrl || 'https://api.deepseek.com/v1',
-            maxTokens: config.data?.maxTokens || 8192,
-            temperature: config.data?.temperature || 0.5,
+            model: config.model || 'deepseek-chat',
+            apiKey: config.apiKey || '',
+            baseUrl: config.baseUrl || 'https://api.deepseek.com/v1',
+            maxTokens: config.maxTokens || 8192,
+            temperature: config.temperature || 0.5,
             apiType: '',
           });
         }
@@ -118,6 +148,7 @@ export default function ConfigLlm(props: { onSuccess?: (success: boolean) => voi
       props.onSuccess?.(false);
     } finally {
       setLoading(false);
+      await refreshConfig();
     }
   };
 
