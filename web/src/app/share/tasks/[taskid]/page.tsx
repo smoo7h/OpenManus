@@ -6,10 +6,13 @@ import { ChatPreview } from '@/components/features/chat/preview';
 import { usePreviewData } from '@/components/features/chat/preview/store';
 import { aggregateMessages } from '@/lib/chat-messages';
 import { Message } from '@/lib/chat-messages/types';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Sparkles } from 'lucide-react';
 
 export default function ChatSharePage() {
+  const router = useRouter();
   const params = useParams();
   const taskId = params.taskid as string;
 
@@ -133,6 +136,12 @@ export default function ChatSharePage() {
             onScroll={handleScroll}
           >
             <ChatMessages messages={aggregateMessages(messages)} />
+          </div>
+          <div className="fixed bottom-4 left-4 z-50">
+            <Button onClick={() => router.push('/')} className="flex items-center gap-2 bg-neutral-900 text-white shadow-lg hover:bg-neutral-800">
+              <Sparkles className="h-4 w-4" />
+              Try it now!
+            </Button>
           </div>
         </div>
       </div>
