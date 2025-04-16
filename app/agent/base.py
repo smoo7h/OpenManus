@@ -312,11 +312,10 @@ class BaseAgent(BaseModel, ABC):
 
         self.emit(BaseAgentEvents.LIFECYCLE_START, {"request": request})
 
-        if request:
-            await self.plan(request)
-
         results: List[str] = []
         async with self.state_context(AgentState.RUNNING):
+            if request:
+                await self.plan(request)
             while (
                 self.current_step < self.max_steps and self.state != AgentState.FINISHED
             ):

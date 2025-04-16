@@ -72,6 +72,8 @@ class Manus(ReActAgent):
     plan_prompt: str = PLAN_PROMPT.format(
         max_steps=20,
         user_prompt="",
+        language="English",
+        available_tools="",
     )
 
     max_steps: int = 20
@@ -116,12 +118,6 @@ class Manus(ReActAgent):
             user_prompt=self.user_prompt,
         )
 
-        self.plan_prompt = PLAN_PROMPT.format(
-            language=self.language or "English",
-            max_steps=self.max_steps,
-            user_prompt=self.user_prompt,
-        )
-
         self.next_step_prompt = NEXT_STEP_PROMPT.format(
             max_steps=self.max_steps,
             current_step=self.current_step,
@@ -154,6 +150,19 @@ class Manus(ReActAgent):
                             "env": tool.env,
                         }
                     )
+
+        self.plan_prompt = PLAN_PROMPT.format(
+            language=self.language or "English",
+            max_steps=self.max_steps,
+            user_prompt=self.user_prompt,
+            available_tools="\n".join(
+                [
+                    f"- {tool.name}: {tool.description}"
+                    for tool in self.tool_call_context_helper.available_tools
+                ]
+            ),
+        )
+
         return self
 
     @model_validator(mode="after")
@@ -162,14 +171,9 @@ class Manus(ReActAgent):
 
     async def plan(self, request: str) -> None:
         """Create an initial plan based on the user request."""
-        plan_prompt = self.plan_prompt.format(
-            max_steps=self.max_steps,
-            user_prompt=self.user_prompt,
-        )
-
         # Create planning message
         planning_message = await self.llm.ask(
-            [Message.system_message(plan_prompt), Message.user_message(request)],
+            [Message.system_message(self.plan_prompt), Message.user_message(request)],
             system_msgs=[Message.system_message(self.system_prompt)],
         )
 
