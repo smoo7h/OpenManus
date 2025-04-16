@@ -7,7 +7,6 @@ from app.agent.manus import Manus
 
 class Task(BaseModel):
     id: str
-    prompt: str
     created_at: datetime
     agent: "Manus"
 

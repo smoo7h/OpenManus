@@ -9,6 +9,7 @@ from mcp.client.sse import sse_client
 from mcp.client.stdio import stdio_client
 from mcp.types import TextContent
 
+from app.config import config
 from app.container.manager import ContainerManager
 from app.logger import logger
 from app.tool.base import BaseTool, ToolResult
@@ -51,6 +52,7 @@ class MCPSandboxClients(ToolCollection):
     exit_stack: AsyncExitStack = None
     description: str = "MCP client tools running in container for server interaction"
     client_id: str = ""
+    _docker_client: Optional[docker.DockerClient] = None
 
     # Container management
     container_name: Optional[str] = None
@@ -60,11 +62,22 @@ class MCPSandboxClients(ToolCollection):
         self.name = f"mcp-{client_id}"  # Keep name for backward compatibility
         self.client_id = client_id
         self.exit_stack = AsyncExitStack()
+        self._docker_client = docker.from_env()
+
+        # ensure network exists
+        try:
+            self._docker_client.networks.get("openmanus-container-network")
+        except docker.errors.NotFound:
+            logger.info("Creating openmanus-container-network...")
+            self._docker_client.networks.create(
+                "openmanus-container-network", driver="bridge", check_duplicate=True
+            )
+            logger.info("Network created successfully")
 
         # Always create a new container but use cached images
         # Generate a container name with timestamp to ensure uniqueness
         timestamp = int(time.time())
-        container_name = f"openmanus-sandbox-{timestamp}-{self.client_id}"
+        container_name = f"openmanus-sandbox-{timestamp}-{''.join(c if c.isalnum() else '-' for c in self.client_id)}"
         self.container_name = container_name
 
     def _get_command_type(self, command: str) -> str:
@@ -99,9 +112,20 @@ class MCPSandboxClients(ToolCollection):
 
         # For docker commands, use the original parameters directly
         if command_type == "docker":
+            docker_args = ["run"]
+
+            if "--rm" not in parameters.args:
+                docker_args.append("--rm")
+            if "-i" not in parameters.args:
+                docker_args.append("-i")
+
+            docker_args.extend(["-v", f"{config.workspace_root}:/workspace"])
+            docker_args.extend(["--network", "openmanus-container-network"])
+            docker_args.extend([parameters.command, *parameters.args])
+
             return StdioServerParameters(
-                command=parameters.command,
-                args=parameters.args,
+                command=docker_command,
+                args=docker_args,
                 env=parameters.env,
             )
 
@@ -132,6 +156,14 @@ class MCPSandboxClients(ToolCollection):
                     "openmanus-yarn-cache:/usr/local/share/.cache/yarn",
                 ]
             )
+
+        # Add workspace directory mount
+        docker_args.extend(
+            [
+                "-v",
+                f"{config.workspace_root}:/workspace",
+            ]
+        )
 
         # Add environment variables to docker command
         env_vars = {
@@ -298,6 +330,17 @@ class MCPSandboxClients(ToolCollection):
                 await container_manager_singleton.stop_container(self.container_name)
                 self.container_name = None
 
+            # clean up docker client
+            if self._docker_client:
+                self._docker_client.close()
+                self._docker_client = None
+
             logger.info(
                 f"Disconnected from MCP server and cleaned up container for client {self.client_id}"
             )
+
+    def __del__(self):
+        """Ensure Docker client resources are cleaned up when the object is garbage collected"""
+        if self._docker_client:
+            self._docker_client.close()
+            self._docker_client = None

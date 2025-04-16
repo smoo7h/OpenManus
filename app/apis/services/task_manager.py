@@ -12,10 +12,9 @@ class TaskManager:
         self.tasks: Dict[str, Task] = {}
         self.queues: Dict[str, asyncio.Queue] = {}
 
-    def create_task(self, task_id: str, prompt: str, agent: Manus) -> Task:
+    def create_task(self, task_id: str, agent: Manus) -> Task:
         task = Task(
             id=task_id,
-            prompt=prompt,
             created_at=datetime.now(),
             agent=agent,
         )

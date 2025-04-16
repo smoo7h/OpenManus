@@ -36,7 +36,7 @@ async def handle_agent_event(task_id: str, event_name: str, step: int, **kwargs)
     )
 
 
-async def run_task(task_id: str):
+async def run_task(task_id: str, prompt: str):
     """Run the task and set up corresponding event handlers.
 
     Args:
@@ -63,7 +63,7 @@ async def run_task(task_id: str):
             )
 
         # Run the agent
-        await agent.run(task.prompt)
+        await agent.run(prompt)
 
         # Ensure all events have been processed
         queue = task_manager.queues[task_id]
@@ -168,7 +168,6 @@ async def create_task(
 
     task = task_manager.create_task(
         task_id,
-        prompt,
         Manus(
             name=AGENT_NAME,
             description="A versatile agent that can solve various tasks using multiple tools",
@@ -223,8 +222,14 @@ async def create_task(
                 raise HTTPException(
                     status_code=500, detail=f"Error saving file: {str(e)}"
                 )
+        prompt = (
+            prompt
+            + "\n\n"
+            + "Here are the files I have uploaded: "
+            + "\n\n".join([f"File: {file.filename}" for file in files])
+        )
 
-    asyncio.create_task(run_task(task.id))
+    asyncio.create_task(run_task(task.id, prompt))
     return {"task_id": task.id}
 
 
@@ -297,7 +302,6 @@ async def restart_task(
 
     task = task_manager.create_task(
         task_id,
-        prompt,
         Manus(
             name=AGENT_NAME,
             description="A versatile agent that can solve various tasks using multiple tools",
@@ -353,8 +357,14 @@ async def restart_task(
                 raise HTTPException(
                     status_code=500, detail=f"Error saving file: {str(e)}"
                 )
+        prompt = (
+            prompt
+            + "\n\n"
+            + "Here are the files I have uploaded: "
+            + "\n\n".join([f"File: {file.filename}" for file in files])
+        )
 
-    asyncio.create_task(run_task(task.id))
+    asyncio.create_task(run_task(task.id, prompt))
     return {"task_id": task.id}
 
 
