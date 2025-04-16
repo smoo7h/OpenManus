@@ -11,9 +11,49 @@ English | [中文](README_zh.md) | [한국어](README_ko.md) | [日本語](READM
 [![Demo](https://img.shields.io/badge/Demo-Hugging%20Face-yellow)](https://huggingface.co/spaces/lyh-917/OpenManusDemo)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15186407.svg)](https://doi.org/10.5281/zenodo.15186407)
 
+# 🎉 iHeyTang OpenManus
+
+Manus is incredible, but OpenManus can achieve any idea without an _Invite Code_ 🛫!
+
+(**Especially with its outstanding frontend interaction experience, it's simply amazing!**)
+
+This project originated from the OpenManus First Hackathon. I'm very grateful to OpenManus for providing such a platform that made this project possible. This is not just a Web UI - it supports full lifecycle MCP integration in the cloud, allowing you to quickly validate all kinds of imaginative AI Agent ideas.
+
+## Project Demo
+
+(Yes, it has full process replay capability, allowing you to share an execution process in an almost lossless way)
+
+https://openmanus.iheytang.com/share/tasks/cm9k3hmiv00ezo8011k4008qx
+
+## Project Features
+
+1. Clean and elegant operation interface - Command line? Not here.
+2. Multi-organization, multi-user support - This is great, each tenant can configure their own APIKey
+3. Background task execution - Ask a question, close the page, come back later to see the results
+4. Quick MCP integration - Install from MCP marketplace, get started with MCP in 1 minute
+5. Task-partitioned workspace - Each task's attachments can be browsed separately
+6. Multi-turn conversation - Not satisfied with the task completion? Just keep asking
+
+## Project Vision
+
+1. Universal AI assistant for all domains, providing the strongest support for super individuals and one-person companies in the AI era
+2. Rapid development and validation for AI Agent of specialized domains, offering the best efficiency platform for vertical AI Agents
+
+## Project Installation
+
+The project consists of two parts: Core (root directory) and App (web/)
+
+### OpenManus Core
+
+Refer to the following OpenManus dependency installation process and start with `python run_api.py`
+
+### OpenManus App
+
+Refer to [/web/README.md](/web/README.md)
+
 # 👋 OpenManus
 
-Manus is incredible, but OpenManus can achieve any idea without an *Invite Code* 🛫!
+Manus is incredible, but OpenManus can achieve any idea without an _Invite Code_ 🛫!
 
 Our team members [@Xinbin Liang](https://github.com/mannaandpoem) and [@Jinyu Xiang](https://github.com/XiangJinyu) (core authors), along with [@Zhaoyang Yu](https://github.com/MoshiQAQ), [@Jiayi Zhang](https://github.com/didiforgithub), and [@Sirui Hong](https://github.com/stellaHSR), we are from [@MetaGPT](https://github.com/geekan/MetaGPT). The prototype is launched within 3 hours and we are keeping building!
 
@@ -84,6 +124,7 @@ uv pip install -r requirements.txt
 ```
 
 ### Browser Automation Tool (Optional)
+
 ```bash
 playwright install
 ```
@@ -127,6 +168,7 @@ python main.py
 Then input your idea via terminal!
 
 For MCP tool version, you can run:
+
 ```bash
 python run_mcp.py
 ```
@@ -146,6 +188,7 @@ Or contact @mannaandpoem via 📧email: mannaandpoem@gmail.com
 **Note**: Before submitting a pull request, please use the pre-commit tool to check your changes. Run `pre-commit run --all-files` to execute the checks.
 
 ## Community Group
+
 Join our networking group on Feishu and share your experience with other developers!
 
 <div align="center" style="display: flex; gap: 20px;">
@@ -157,9 +200,10 @@ Join our networking group on Feishu and share your experience with other develop
 [![Star History Chart](https://api.star-history.com/svg?repos=mannaandpoem/OpenManus&type=Date)](https://star-history.com/#mannaandpoem/OpenManus&Date)
 
 ## Sponsors
-Thanks to [PPIO](https://ppinfra.com/user/register?invited_by=OCPKCN&utm_source=github_openmanus&utm_medium=github_readme&utm_campaign=link) for computing source support.
-> PPIO: The most affordable and easily-integrated MaaS and GPU cloud solution.
 
+Thanks to [PPIO](https://ppinfra.com/user/register?invited_by=OCPKCN&utm_source=github_openmanus&utm_medium=github_readme&utm_campaign=link) for computing source support.
+
+> PPIO: The most affordable and easily-integrated MaaS and GPU cloud solution.
 
 ## Acknowledgement
 
@@ -173,6 +217,7 @@ We also thank stepfun(阶跃星辰) for supporting our Hugging Face demo space.
 OpenManus is built by contributors from MetaGPT. Huge thanks to this agent community!
 
 ## Cite
+
 ```bibtex
 @misc{openmanus2025,
   author = {Xinbin Liang and Jinyu Xiang and Zhaoyang Yu and Jiayi Zhang and Sirui Hong and Sheng Fan and Xiao Tang},
