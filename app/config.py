@@ -1,3 +1,4 @@
+import os
 import threading
 import tomllib
 from pathlib import Path
@@ -273,6 +274,11 @@ class Config:
     def root_path(self) -> Path:
         """Get the root path of the application"""
         return PROJECT_ROOT
+
+    @property
+    def host_workspace_root(self) -> Path:
+        """Get the host workspace root directory, it's used for MCP sandbox"""
+        return Path(os.getenv("HOST_WORKSPACE_ROOT", WORKSPACE_ROOT))
 
 
 config = Config()
