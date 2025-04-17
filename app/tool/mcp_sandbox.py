@@ -56,6 +56,8 @@ class MCPSandboxClients(ToolCollection):
 
     # Container management
     container_name: Optional[str] = None
+    # source container name, it's OpenManus core container
+    _source_container_id: Optional[str] = None
 
     def __init__(self, client_id: str):
         super().__init__()  # Initialize with empty tools list
@@ -79,6 +81,7 @@ class MCPSandboxClients(ToolCollection):
         timestamp = int(time.time())
         container_name = f"openmanus-sandbox-{timestamp}-{''.join(c if c.isalnum() else '-' for c in self.client_id)}"
         self.container_name = container_name
+        self._source_container_id = self._get_current_container_id()
 
     def _get_command_type(self, command: str) -> str:
         """Determine the type of command (uvx/npx/docker)."""
@@ -90,6 +93,16 @@ class MCPSandboxClients(ToolCollection):
             return "docker"
         else:
             raise ValueError(f"Unsupported command type: {command}")
+
+    def _get_current_container_id(self) -> Optional[str]:
+        """Get the current container ID if running in a container."""
+        try:
+            with open("/proc/1/cgroup", "r") as f:
+                for line in f:
+                    if "docker" in line:
+                        return line.split("/")[-1].strip()
+        except:
+            return None
 
     def _convert_to_docker_command(
         self, parameters: StdioServerParameters
@@ -119,7 +132,10 @@ class MCPSandboxClients(ToolCollection):
             if "-i" not in parameters.args:
                 docker_args.append("-i")
 
-            docker_args.extend(["-v", f"{config.workspace_root}:/workspace"])
+            if self._source_container_id:
+                docker_args.extend(["--volumes-from", self._source_container_id])
+            else:
+                docker_args.extend(["-v", f"{config.workspace_root}:/workspace"])
             docker_args.extend(["--network", "openmanus-container-network"])
             docker_args.extend([parameters.command, *parameters.args])
 
@@ -158,12 +174,10 @@ class MCPSandboxClients(ToolCollection):
             )
 
         # Add workspace directory mount
-        docker_args.extend(
-            [
-                "-v",
-                f"{config.workspace_root}:/workspace",
-            ]
-        )
+        if self._source_container_id:
+            docker_args.extend(["--volumes-from", self._source_container_id])
+        else:
+            docker_args.extend(["-v", f"{config.workspace_root}:/workspace"])
 
         # Add environment variables to docker command
         env_vars = {
