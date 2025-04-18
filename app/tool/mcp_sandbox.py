@@ -10,13 +10,9 @@ from mcp.client.stdio import stdio_client
 from mcp.types import TextContent
 
 from app.config import config
-from app.container.manager import ContainerManager
 from app.logger import logger
 from app.tool.base import BaseTool, ToolResult
 from app.tool.tool_collection import ToolCollection
-
-container_manager_singleton = ContainerManager()
-
 
 class MCPSandboxClientTool(BaseTool):
     """Represents a tool proxy that can be called on the MCP server from the client side, running in a sandbox."""
@@ -320,11 +316,6 @@ class MCPSandboxClients(ToolCollection):
             self.session = None
             self.tools = tuple()
             self.tool_map = {}
-
-            # Clean up container if needed
-            if self.container_name:
-                await container_manager_singleton.stop_container(self.container_name)
-                self.container_name = None
 
             # clean up docker client
             if self._docker_client:

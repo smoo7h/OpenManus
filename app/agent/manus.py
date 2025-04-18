@@ -104,8 +104,8 @@ class Manus(ReActAgent):
         if user_prompt is not None:
             self.user_prompt = user_prompt
 
-        if not os.path.exists(self.task_dir):
-            os.makedirs(self.task_dir)
+        if not os.path.exists(config.workspace_root):
+            os.makedirs(config.workspace_root)
 
         self.system_prompt = SYSTEM_PROMPT.format(
             directory="/workspace",
