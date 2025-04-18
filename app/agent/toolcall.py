@@ -294,7 +294,6 @@ class ToolCallContextHelper:
                     {
                         "id": call.id,
                         "type": call.type,
-                        "index": call.index,
                         "function": {
                             "name": call.function.name,
                             "arguments": json.loads(call.function.arguments),
