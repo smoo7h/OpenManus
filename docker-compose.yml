@@ -6,9 +6,9 @@ services:
     image: iheytang/openmanus-core:latest
     volumes:
       # 指定宿主机的 workspace 目录，请根据实际情况修改
-      # 如果是当前项目目录，就是 ./workspace:/app/workspace
+      # 如果是当前项目目录，就是 ./workspace:/workspace
       # 默认使用当前项目目录下已有的 workspace 目录
-      - ./workspace:/app/workspace
+      - ./workspace:/workspace
       # 指定宿主机的 docker socket
       # 1. 使用 Linux 进行部署时，root 用户 sock 一般位于 /var/user/0/docker/docker.sock
       # 2. 使用 WSL 进行部署时，sock 一般位于 /var/run/docker.sock
@@ -18,6 +18,10 @@ services:
       - PYTHONUNBUFFERED=1
       # 指定 Docker 主机
       - DOCKER_HOST=unix:///var/run/docker.sock
+      # 指定工作区根目录，这个和volumes中的卷映射是搭配使用的（就是卷映射中的容器目录）
+      - WORKSPACE_ROOT=/workspace
+      # 指定宿主机的 workspace 目录，这个和volumes中的卷映射是搭配使用的（就是卷映射中的宿主机目录），它的作用是保证 MCP Sandbox 也能正确读取到 Workspace
+      - HOST_WORKSPACE_ROOT=./workspace
     security_opt:
       - seccomp=unconfined
     cap_add:
