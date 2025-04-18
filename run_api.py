@@ -4,10 +4,13 @@ import tomllib
 import webbrowser
 from functools import partial
 from pathlib import Path
+from typing import Any, Dict
 
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
 
 from app.apis import router
 
@@ -24,10 +27,46 @@ app.add_middleware(
 app.include_router(router)
 
 
-@app.exception_handler(Exception)
-async def generic_exception_handler(request: Request, exc: Exception):
+def format_validation_error(errors: list[Any]) -> Dict[str, Any]:
+    """Format validation error messages"""
+    formatted_errors = []
+    for error in errors:
+        loc = ".".join(str(x) for x in error["loc"])
+        msg = error["msg"]
+        formatted_errors.append({"field": loc, "message": msg})
+    return {
+        "code": 400,
+        "message": "Request parameter validation failed",
+        "errors": formatted_errors,
+    }
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(_: Request, exc: RequestValidationError):
+    """Handle request parameter validation errors"""
+    return JSONResponse(status_code=400, content=format_validation_error(exc.errors()))
+
+
+@app.exception_handler(ValidationError)
+async def pydantic_validation_exception_handler(_: Request, exc: ValidationError):
+    """Handle Pydantic model validation errors"""
+    return JSONResponse(status_code=400, content=format_validation_error(exc.errors()))
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(_: Request, exc: HTTPException):
+    """Handle HTTP exceptions"""
     return JSONResponse(
-        status_code=500, content={"message": f"Server error: {str(exc)}"}
+        status_code=exc.status_code,
+        content={"code": exc.status_code, "message": exc.detail},
+    )
+
+
+@app.exception_handler(Exception)
+async def generic_exception_handler(_: Request, exc: Exception):
+    """Handle other exceptions"""
+    return JSONResponse(
+        status_code=500, content={"code": 500, "message": f"Server error: {str(exc)}"}
     )
 
 

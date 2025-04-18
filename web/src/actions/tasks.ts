@@ -70,8 +70,6 @@ export const createTask = withUserAuth(async ({ organization, args }: AuthWrappe
     return tool;
   });
 
-  console.log(processedTools);
-
   // Create task
   const task = await prisma.tasks.create({
     data: {
@@ -107,12 +105,17 @@ export const createTask = withUserAuth(async ({ organization, args }: AuthWrappe
     fetch(`${MANUS_URL}/tasks`, {
       method: 'POST',
       body: formData,
-    }).then(res => res.json() as Promise<{ task_id: string }>),
+    }).then(async res => {
+      if (res.status === 200) {
+        return (await res.json()) as Promise<{ task_id: string }>;
+      }
+      throw Error(`Server Error: ${JSON.stringify(await res.json())}`);
+    }),
   );
 
   if (error || !response.task_id) {
     await prisma.tasks.update({ where: { id: task.id }, data: { status: 'failed' } });
-    throw new Error('Failed to create task');
+    throw error || new Error('Unkown Error');
   }
 
   await prisma.tasks.update({ where: { id: task.id }, data: { outId: response.task_id, status: 'processing' } });
