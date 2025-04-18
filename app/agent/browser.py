@@ -95,12 +95,9 @@ class BrowserContextHelper:
                     )
                     if not os.path.exists(task_dir):
                         os.makedirs(task_dir, exist_ok=True)
-                    image_path = f"{task_dir}/screenshot_{time.time()}.png"
-                    with open(image_path, "wb") as f:
+                    screenshot_path = f"{task_dir}/screenshot_{time.time()}.png"
+                    with open(screenshot_path, "wb") as f:
                         f.write(base64.b64decode(self._current_base64_image))
-
-                    relative_path = os.path.relpath(image_path, config.workspace_root)
-                    screenshot_path = f"/workspace/{relative_path}"
                 else:
                     screenshot_path = self._pre_base64_path
 
@@ -127,11 +124,7 @@ class BrowserContextHelper:
                     "tabs": tabs_info,
                     "content_above": content_above_info,
                     "content_below": content_below_info,
-                    "screenshot": (
-                        Path(screenshot_path)
-                        .as_posix()
-                        .replace(config.workspace_root.as_posix(), "/workspace")
-                    ),
+                    "screenshot": (Path(screenshot_path).as_posix()),
                     "results": results_info,
                 },
             )

@@ -13,7 +13,7 @@ def get_project_root() -> Path:
 
 
 PROJECT_ROOT = get_project_root()
-WORKSPACE_ROOT = PROJECT_ROOT / "workspace"
+WORKSPACE_ROOT = os.getenv("WORKSPACE_ROOT", PROJECT_ROOT / "workspace")
 
 
 class LLMSettings(BaseModel):
@@ -267,8 +267,19 @@ class Config:
 
     @property
     def workspace_root(self) -> Path:
-        """Get the workspace root directory"""
-        return WORKSPACE_ROOT
+        """
+        Get the workspace root directory
+        If the WORKSPACE_ROOT environment variable is set, use it as the workspace root.
+        Otherwise, use the default workspace root(PROJECT_ROOT / "workspace"). the directory is under the project root.
+
+        If you are developing,
+        keeping the default workspace root is recommended. you can find the workspace root directory in the project root.
+
+        If you are running the application in a docker container,
+        you'd better manually specify a root path for the workspace.
+        It is recommended to use `/workspace`, and then use Docker volume mapping to map the path inside the container to your desired location on the host machine.
+        """
+        return Path(os.getenv("WORKSPACE_ROOT", WORKSPACE_ROOT))
 
     @property
     def root_path(self) -> Path:
@@ -277,7 +288,18 @@ class Config:
 
     @property
     def host_workspace_root(self) -> Path:
-        """Get the host workspace root directory, it's used for MCP sandbox"""
+        """
+        Get the host workspace root directory, it's used for MCP sandbox.
+        If the HOST_WORKSPACE_ROOT environment variable is set, use it as the host workspace root.
+        Otherwise, use the default host workspace root(PROJECT_ROOT / "workspace"). the directory is under the project root.
+
+        If you are developing,
+        keeping the default host workspace root is recommended. it would be the same as the workspace root.
+
+        If you are running the application in a docker container,
+        you'd better manually specify a root path for the host workspace.
+        It is recommended to use the path of the host workspace which is the same as docker volume mapping path, see the `workspace_root` property for more details.
+        """
         return Path(os.getenv("HOST_WORKSPACE_ROOT", WORKSPACE_ROOT))
 
 

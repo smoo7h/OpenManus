@@ -48,15 +48,14 @@ class LocalFileOperator(FileOperator):
     def _resolve_path(self, path: PathLike) -> Path:
         """Resolve path relative to base_path."""
         # Convert Windows-style path to POSIX-style
-        path_str = str(path).replace("\\", "/")
+        path_str = Path(path).as_posix()
 
-        if not path_str.startswith("/workspace"):
+        if not path_str.startswith(config.workspace_root.as_posix()):
             raise ToolError(f"Path {path_str} is not a valid path")
 
-        resolved = Path(self.base_path / path_str.replace("/workspace/", ""))
-        if not resolved.parent.exists():
-            os.makedirs(resolved.parent, exist_ok=True)
-        return resolved
+        if not Path(path_str).parent.exists():
+            os.makedirs(Path(path_str).parent, exist_ok=True)
+        return Path(path_str)
 
     async def read_file(self, path: PathLike) -> str:
         """Read content from a local file."""
