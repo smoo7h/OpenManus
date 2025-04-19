@@ -4,20 +4,16 @@
 
 [English](README.md) | 中文 | [한국어](README_ko.md) | [日本語](README_ja.md)
 
-[![GitHub stars](https://img.shields.io/github/stars/mannaandpoem/OpenManus?style=social)](https://github.com/mannaandpoem/OpenManus/stargazers)
-&ensp;
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) &ensp;
-[![Discord Follow](https://dcbadge.vercel.app/api/server/DYn29wFk9z?style=flat)](https://discord.gg/DYn29wFk9z)
-[![Demo](https://img.shields.io/badge/Demo-Hugging%20Face-yellow)](https://huggingface.co/spaces/lyh-917/OpenManusDemo)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15186407.svg)](https://doi.org/10.5281/zenodo.15186407)
-
 # 🎉 iHeyTang OpenManus
 
 Manus 非常棒，但 OpenManus 无需邀请码即可实现任何创意 🛫！
 
 (**特别是当他它有了非常出色的前端交互体验，简直太棒了！**)
 
-本项目起源于 OpenManus First Hackathon，非常感谢 OpenManus 提供这样的一个平台，得以让本项目有了落地的机会。该项目不仅仅是一个 Web UI，它支持云上全生命周期的 MCP 接入，这使得你对于各种 AI Agent 天马行空的想象都可以在这里得到快速的验证。
+## 项目愿景
+
+1. 通用领域全能 AI 助手，为 AI 时代的超级个体和一人公司提供最有力的支持
+2. 专精领域 AI 智能体的快速开发验证，为垂类 AI Agent 提供最好的效率平台
 
 ## 项目演示
 
@@ -34,67 +30,11 @@ https://openmanus.iheytang.com/share/tasks/cm9k3hmiv00ezo8011k4008qx
 5. 以任务为分区的工作区 - 每一个任务的附件都能够单独浏览
 6. 多轮对话 - 任务完成的不好？再继续追问
 
-## 项目愿景
-
-1. 通用领域全能 AI 助手，为 AI 时代的超级个体和一人公司提供最有力的支持
-2. 专精领域 AI 智能体的快速开发验证，为垂类 AI Agent 提供最好的效率平台
-
-## 项目安装
+## 安装指南
 
 该项目分为两个部分，分别是 Core (根目录) 和 App (web/)
 
 ### OpenManus Core
-
-参考以下 OpenManus 的依赖安装过程，并使用 `python run_api.py` 启动
-
-### OpenManus App
-
-参考 [/web/README-zh.md](/web/README-zh.md)
-
-# 👋 OpenManus
-
-Manus 非常棒，但 OpenManus 无需邀请码即可实现任何创意 🛫！
-
-我们的团队成员 [@Xinbin Liang](https://github.com/mannaandpoem) 和 [@Jinyu Xiang](https://github.com/XiangJinyu)（核心作者），以及 [@Zhaoyang Yu](https://github.com/MoshiQAQ)、[@Jiayi Zhang](https://github.com/didiforgithub) 和 [@Sirui Hong](https://github.com/stellaHSR)，来自 [@MetaGPT](https://github.com/geekan/MetaGPT)团队。我们在 3
-小时内完成了开发并持续迭代中！
-
-这是一个简洁的实现方案，欢迎任何建议、贡献和反馈！
-
-用 OpenManus 开启你的智能体之旅吧！
-
-我们也非常高兴地向大家介绍 [OpenManus-RL](https://github.com/OpenManus/OpenManus-RL)，这是一个专注于基于强化学习（RL，例如 GRPO）的方法来优化大语言模型（LLM）智能体的开源项目，由来自 UIUC 和 OpenManus 的研究人员合作开发。
-
-## 项目演示
-
-<video src="https://private-user-images.githubusercontent.com/61239030/420168772-6dcfd0d2-9142-45d9-b74e-d10aa75073c6.mp4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDEzMTgwNTksIm5iZiI6MTc0MTMxNzc1OSwicGF0aCI6Ii82MTIzOTAzMC80MjAxNjg3NzItNmRjZmQwZDItOTE0Mi00NWQ5LWI3NGUtZDEwYWE3NTA3M2M2Lm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzA3VDAzMjIzOVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTdiZjFkNjlmYWNjMmEzOTliM2Y3M2VlYjgyNDRlZDJmOWE3NWZhZjE1MzhiZWY4YmQ3NjdkNTYwYTU5ZDA2MzYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.UuHQCgWYkh0OQq9qsUWqGsUbhG3i9jcZDAMeHjLt5T4" data-canonical-src="https://private-user-images.githubusercontent.com/61239030/420168772-6dcfd0d2-9142-45d9-b74e-d10aa75073c6.mp4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDEzMTgwNTksIm5iZiI6MTc0MTMxNzc1OSwicGF0aCI6Ii82MTIzOTAzMC80MjAxNjg3NzItNmRjZmQwZDItOTE0Mi00NWQ5LWI3NGUtZDEwYWE3NTA3M2M2Lm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzA3VDAzMjIzOVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTdiZjFkNjlmYWNjMmEzOTliM2Y3M2VlYjgyNDRlZDJmOWE3NWZhZjE1MzhiZWY4YmQ3NjdkNTYwYTU5ZDA2MzYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.UuHQCgWYkh0OQq9qsUWqGsUbhG3i9jcZDAMeHjLt5T4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px; min-height: 200px"></video>
-
-## 安装指南
-
-我们提供两种安装方式。推荐使用方式二（uv），因为它能提供更快的安装速度和更好的依赖管理。
-
-### 方式一：使用 conda
-
-1. 创建新的 conda 环境：
-
-```bash
-conda create -n open_manus python=3.12
-conda activate open_manus
-```
-
-2. 克隆仓库：
-
-```bash
-git clone https://github.com/mannaandpoem/OpenManus.git
-cd OpenManus
-```
-
-3. 安装依赖：
-
-```bash
-pip install -r requirements.txt
-```
-
-### 方式二：使用 uv（推荐）
 
 1. 安装 uv（一个快速的 Python 包管理器）：
 
@@ -105,7 +45,7 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 2. 克隆仓库：
 
 ```bash
-git clone https://github.com/mannaandpoem/OpenManus.git
+git clone https://github.com/iHeyTang/OpenManus.git
 cd OpenManus
 ```
 
@@ -116,116 +56,114 @@ uv venv --python 3.12
 source .venv/bin/activate  # Unix/macOS 系统
 # Windows 系统使用：
 # .venv\Scripts\activate
+
+# 安装成功后，会有以下提示，可以选择重开Terminal 或 按照以下提示进行操作
+#To add $HOME/.local/bin to your PATH, either restart your shell or run:
+#    source $HOME/.local/bin/env (sh, bash, zsh)
+#    source $HOME/.local/bin/env.fish (fish)
+
+# 验证 uv 安装成功
+uv --version
+# 输出以下版本号则表示安装成功
+# uv 0.6.14 (a4cec56dc 2025-04-09)
 ```
 
 4. 安装依赖：
 
-```bash
+````bash
 uv pip install -r requirements.txt
-```
 
-### 浏览器自动化工具（可选）
-
+### 安装浏览器自动化工具 playwright
 ```bash
 playwright install
-```
+````
 
-## 配置说明
+5. 安装 Docker 环境，windows 推荐 [Docker Desktop](https://www.docker.com/products/docker-desktop/)，MacOS 或 Linux 推荐 [Orbstack](https://orbstack.dev/download)
 
-OpenManus 需要配置使用的 LLM API，请按以下步骤设置：
+### OpenManus App
 
-1. 在 `config` 目录创建 `config.toml` 文件（可从示例复制）：
+1. 安装 `node` 环境
+
+   方式 1: [推荐] 使用 nvm 包管理器 https://github.com/nvm-sh/nvm
+   方式 2: 前往官方下载 https://nodejs.org/en
+   方式 3: (Windows 系统) 使用 nvm 包管理器 https://github.com/coreybutler/nvm-windows/releases/tag/1.2.2
 
 ```bash
-cp config/config.example.toml config/config.toml
+# 按照流程安装完毕后，通过命令确认安装成功
+node -v
+# 输出版本号表示安装成功
+# v20.19.0
 ```
 
-2. 编辑 `config/config.toml` 添加 API 密钥和自定义设置：
+2. 进入 `web/` 文件夹
 
-```toml
-# 全局 LLM 配置
-[llm]
-model = "gpt-4o"
-base_url = "https://api.openai.com/v1"
-api_key = "sk-..."  # 替换为真实 API 密钥
-max_tokens = 4096
-temperature = 0.0
+```bash
+# 如果已经在 web 目录下忽略即可
+cd web
+```
 
-# 可选特定 LLM 模型配置
-[llm.vision]
-model = "gpt-4o"
-base_url = "https://api.openai.com/v1"
-api_key = "sk-..."  # 替换为真实 API 密钥
+3. 安装项目依赖
+
+```bash
+# 安装项目依赖
+npm install
+```
+
+4. 生成密钥对
+
+项目需要一对公钥和私钥用于认证，可以通过以下命令生成（有自行生成证书能力的忽略即可）：
+
+```bash
+npm run generate-keys
+
+# 这将在 `web/keys` 目录生成：
+# - `private.pem`: 私钥文件
+# - `public.pem`: 公钥文件
+```
+
+5. 数据库初始化
+
+项目使用 PostgreSQL 作为持久化数据库。可使用 [Docker 容器](https://hub.docker.com/_/postgres) 来启动数据库服务
+
+```bash
+# 启动 docker 容器 并自动创建 名为 openmanus 的数据库
+docker run --name openmanus-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=openmanus -d -p 5432:5432 postgres
+```
+
+6. 环境变量配置
+
+在项目根目录创建 `.env` 文件，配置必要的环境变量，具体参考 `/web/.env.example`
+
+```bash
+# 若按照 步骤 5 配置数据库，则数据库连接为
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/openmanus?schema=public"
+```
+
+7. 生成 Prisma 客户端 & 初始化数据库
+
+```bash
+# 若第一次启动项目、重新安装了依赖、schema.prisma 存在更新，需执行此命令更新 Prisma Client
+npx prisma generate
+
+# 若第一次启动项目，需要先初始化数据库，此命令会自动将表结构同步进相应配置的数据库中
+npx prisma db push
 ```
 
 ## 快速启动
 
-一行命令运行 OpenManus：
-
 ```bash
-python main.py
+# OpenManus Core 使用 run_api.py 启动
+python run_api.py
 ```
 
-然后通过终端输入你的创意！
-
-如需使用 MCP 工具版本，可运行：
-
 ```bash
-python run_mcp.py
+# OpenManus App 需要进入 web/ 目录， 使用 npm run dev 启动
+cd web
+npm run dev
 ```
 
-如需体验不稳定的多智能体版本，可运行：
-
-```bash
-python run_flow.py
-```
-
-## 贡献指南
-
-我们欢迎任何友好的建议和有价值的贡献！可以直接创建 issue 或提交 pull request。
-
-或通过 📧 邮件联系 @mannaandpoem：mannaandpoem@gmail.com
-
-**注意**: 在提交 pull request 之前，请使用 pre-commit 工具检查您的更改。运行 `pre-commit run --all-files` 来执行检查。
-
-## 交流群
-
-加入我们的飞书交流群，与其他开发者分享经验！
-
-<div align="center" style="display: flex; gap: 20px;">
-    <img src="assets/community_group.jpg" alt="OpenManus 交流群" width="300" />
-</div>
-
-## Star 数量
-
-[![Star History Chart](https://api.star-history.com/svg?repos=mannaandpoem/OpenManus&type=Date)](https://star-history.com/#mannaandpoem/OpenManus&Date)
-
-## 赞助商
-
-感谢[PPIO](https://ppinfra.com/user/register?invited_by=OCPKCN&utm_source=github_openmanus&utm_medium=github_readme&utm_campaign=link) 提供的算力支持。
-
-> PPIO 派欧云：一键调用高性价比的开源模型 API 和 GPU 容器
+启动完毕后，打开 `http://localhost:3000` 即可查看
 
 ## 致谢
 
-特别感谢 [anthropic-computer-use](https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo)
-和 [browser-use](https://github.com/browser-use/browser-use) 为本项目提供的基础支持！
-
-此外，我们感谢 [AAAJ](https://github.com/metauto-ai/agent-as-a-judge)，[MetaGPT](https://github.com/geekan/MetaGPT)，[OpenHands](https://github.com/All-Hands-AI/OpenHands) 和 [SWE-agent](https://github.com/SWE-agent/SWE-agent).
-
-我们也感谢阶跃星辰 (stepfun) 提供的 Hugging Face 演示空间支持。
-
-OpenManus 由 MetaGPT 社区的贡献者共同构建，感谢这个充满活力的智能体开发者社区！
-
-## 引用
-
-```bibtex
-@misc{openmanus2025,
-  author = {Xinbin Liang and Jinyu Xiang and Zhaoyang Yu and Jiayi Zhang and Sirui Hong and Sheng Fan and Xiao Tang},
-  title = {OpenManus: An open-source framework for building general AI agents},
-  year = {2025},
-  publisher = {Zenodo},
-  doi = {10.5281/zenodo.15186407},
-  url = {https://doi.org/10.5281/zenodo.15186407},
-}
-```
+本项目起源于 [OpenManus](https://github.com/mannaandpoem/OpenManus) First Hackathon，非常感谢 OpenManus 提供这样的一个平台，得以让本项目有了落地的机会!

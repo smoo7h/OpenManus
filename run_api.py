@@ -100,6 +100,4 @@ if __name__ == "__main__":
     import uvicorn
 
     config = load_config()
-    open_with_config = partial(open_local_browser, config)
-    threading.Timer(3, open_with_config).start()
     uvicorn.run(app, host=config["host"], port=config["port"])

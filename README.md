@@ -2,22 +2,18 @@
   <img src="assets/logo.jpg" width="200"/>
 </p>
 
-English | [中文](README_zh.md) | [한국어](README_ko.md) | [日本語](README_ja.md)
-
-[![GitHub stars](https://img.shields.io/github/stars/mannaandpoem/OpenManus?style=social)](https://github.com/mannaandpoem/OpenManus/stargazers)
-&ensp;
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT) &ensp;
-[![Discord Follow](https://dcbadge.vercel.app/api/server/DYn29wFk9z?style=flat)](https://discord.gg/DYn29wFk9z)
-[![Demo](https://img.shields.io/badge/Demo-Hugging%20Face-yellow)](https://huggingface.co/spaces/lyh-917/OpenManusDemo)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15186407.svg)](https://doi.org/10.5281/zenodo.15186407)
+English | [中文](README.md)
 
 # 🎉 iHeyTang OpenManus
 
-Manus is incredible, but OpenManus can achieve any idea without an _Invite Code_ 🛫!
+Manus is amazing, but OpenManus can realize any creative idea without an invitation code 🛫!
 
-(**Especially with its outstanding frontend interaction experience, it's simply amazing!**)
+(**Especially when it has an outstanding frontend interaction experience, it's simply fantastic!**)
 
-This project originated from the OpenManus First Hackathon. I'm very grateful to OpenManus for providing such a platform that made this project possible. This is not just a Web UI - it supports full lifecycle MCP integration in the cloud, allowing you to quickly validate all kinds of imaginative AI Agent ideas.
+## Project Vision
+
+1. A versatile AI assistant for general domains, providing the strongest support for super individuals and one-person companies in the AI era
+2. Rapid development and validation of specialized domain AI agents, offering the best efficiency platform for vertical AI Agents
 
 ## Project Demo
 
@@ -29,73 +25,18 @@ https://openmanus.iheytang.com/share/tasks/cm9k3hmiv00ezo8011k4008qx
 
 1. Clean and elegant operation interface - Command line? Not here.
 2. Multi-organization, multi-user support - This is great, each tenant can configure their own APIKey
-3. Background task execution - Ask a question, close the page, come back later to see the results
-4. Quick MCP integration - Install from MCP marketplace, get started with MCP in 1 minute
+3. Background task execution - Ask questions, close the page, come back later to see the results
+4. Quick MCP integration - Fast installation from MCP marketplace, get started with MCP in 1 minute
 5. Task-partitioned workspace - Each task's attachments can be browsed separately
-6. Multi-turn conversation - Not satisfied with the task completion? Just keep asking
+6. Multi-turn conversations - Task not completed well? Keep asking questions
 
-## Project Vision
+## Installation Guide
 
-1. Universal AI assistant for all domains, providing the strongest support for super individuals and one-person companies in the AI era
-2. Rapid development and validation for AI Agent of specialized domains, offering the best efficiency platform for vertical AI Agents
-
-## Project Installation
-
-The project consists of two parts: Core (root directory) and App (web/)
+The project is divided into two parts: Core (root directory) and App (web/)
 
 ### OpenManus Core
 
-Refer to the following OpenManus dependency installation process and start with `python run_api.py`
-
-### OpenManus App
-
-Refer to [/web/README.md](/web/README.md)
-
-# 👋 OpenManus
-
-Manus is incredible, but OpenManus can achieve any idea without an _Invite Code_ 🛫!
-
-Our team members [@Xinbin Liang](https://github.com/mannaandpoem) and [@Jinyu Xiang](https://github.com/XiangJinyu) (core authors), along with [@Zhaoyang Yu](https://github.com/MoshiQAQ), [@Jiayi Zhang](https://github.com/didiforgithub), and [@Sirui Hong](https://github.com/stellaHSR), we are from [@MetaGPT](https://github.com/geekan/MetaGPT). The prototype is launched within 3 hours and we are keeping building!
-
-It's a simple implementation, so we welcome any suggestions, contributions, and feedback!
-
-Enjoy your own agent with OpenManus!
-
-We're also excited to introduce [OpenManus-RL](https://github.com/OpenManus/OpenManus-RL), an open-source project dedicated to reinforcement learning (RL)- based (such as GRPO) tuning methods for LLM agents, developed collaboratively by researchers from UIUC and OpenManus.
-
-## Project Demo
-
-<video src="https://private-user-images.githubusercontent.com/61239030/420168772-6dcfd0d2-9142-45d9-b74e-d10aa75073c6.mp4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDEzMTgwNTksIm5iZiI6MTc0MTMxNzc1OSwicGF0aCI6Ii82MTIzOTAzMC80MjAxNjg3NzItNmRjZmQwZDItOTE0Mi00NWQ5LWI3NGUtZDEwYWE3NTA3M2M2Lm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzA3VDAzMjIzOVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTdiZjFkNjlmYWNjMmEzOTliM2Y3M2VlYjgyNDRlZDJmOWE3NWZhZjE1MzhiZWY4YmQ3NjdkNTYwYTU5ZDA2MzYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.UuHQCgWYkh0OQq9qsUWqGsUbhG3i9jcZDAMeHjLt5T4" data-canonical-src="https://private-user-images.githubusercontent.com/61239030/420168772-6dcfd0d2-9142-45d9-b74e-d10aa75073c6.mp4?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3NDEzMTgwNTksIm5iZiI6MTc0MTMxNzc1OSwicGF0aCI6Ii82MTIzOTAzMC80MjAxNjg3NzItNmRjZmQwZDItOTE0Mi00NWQ5LWI3NGUtZDEwYWE3NTA3M2M2Lm1wND9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNTAzMDclMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjUwMzA3VDAzMjIzOVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPTdiZjFkNjlmYWNjMmEzOTliM2Y3M2VlYjgyNDRlZDJmOWE3NWZhZjE1MzhiZWY4YmQ3NjdkNTYwYTU5ZDA2MzYmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0In0.UuHQCgWYkh0OQq9qsUWqGsUbhG3i9jcZDAMeHjLt5T4" controls="controls" muted="muted" class="d-block rounded-bottom-2 border-top width-fit" style="max-height:640px; min-height: 200px"></video>
-
-## Installation
-
-We provide two installation methods. Method 2 (using uv) is recommended for faster installation and better dependency management.
-
-### Method 1: Using conda
-
-1. Create a new conda environment:
-
-```bash
-conda create -n open_manus python=3.12
-conda activate open_manus
-```
-
-2. Clone the repository:
-
-```bash
-git clone https://github.com/mannaandpoem/OpenManus.git
-cd OpenManus
-```
-
-3. Install dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
-### Method 2: Using uv (Recommended)
-
-1. Install uv (A fast Python package installer and resolver):
+1. Install uv (a fast Python package manager):
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -104,127 +45,125 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 2. Clone the repository:
 
 ```bash
-git clone https://github.com/mannaandpoem/OpenManus.git
+git clone https://github.com/iHeyTang/OpenManus.git
 cd OpenManus
 ```
 
-3. Create a new virtual environment and activate it:
+3. Create and activate virtual environment:
 
 ```bash
 uv venv --python 3.12
-source .venv/bin/activate  # On Unix/macOS
-# Or on Windows:
+source .venv/bin/activate  # Unix/macOS systems
+# For Windows systems use:
 # .venv\Scripts\activate
+
+# After successful installation, you'll see the following prompt. You can either restart Terminal or follow these instructions:
+#To add $HOME/.local/bin to your PATH, either restart your shell or run:
+#    source $HOME/.local/bin/env (sh, bash, zsh)
+#    source $HOME/.local/bin/env.fish (fish)
+
+# Verify uv installation success
+uv --version
+# Output the following version number indicates successful installation
+# uv 0.6.14 (a4cec56dc 2025-04-09)
 ```
 
 4. Install dependencies:
 
-```bash
+````bash
 uv pip install -r requirements.txt
-```
 
-### Browser Automation Tool (Optional)
-
+### Install browser automation tool playwright
 ```bash
 playwright install
-```
+````
 
-## Configuration
+5. Install Docker environment, recommended [Docker Desktop](https://www.docker.com/products/docker-desktop/) for Windows, [Orbstack](https://orbstack.dev/download) for MacOS or Linux
 
-OpenManus requires configuration for the LLM APIs it uses. Follow these steps to set up your configuration:
+### OpenManus App
 
-1. Create a `config.toml` file in the `config` directory (you can copy from the example):
+1. Install `node` environment
+
+   Method 1: [Recommended] Use nvm package manager https://github.com/nvm-sh/nvm
+   Method 2: Download from official website https://nodejs.org/en
+   Method 3: (Windows systems) Use nvm package manager https://github.com/coreybutler/nvm-windows/releases/tag/1.2.2
 
 ```bash
-cp config/config.example.toml config/config.toml
+# After installation, verify success with command
+node -v
+# Output version number indicates successful installation
+# v20.19.0
 ```
 
-2. Edit `config/config.toml` to add your API keys and customize settings:
+2. Enter `web/` folder
 
-```toml
-# Global LLM configuration
-[llm]
-model = "gpt-4o"
-base_url = "https://api.openai.com/v1"
-api_key = "sk-..."  # Replace with your actual API key
-max_tokens = 4096
-temperature = 0.0
+```bash
+# Ignore if already in web directory
+cd web
+```
 
-# Optional configuration for specific LLM models
-[llm.vision]
-model = "gpt-4o"
-base_url = "https://api.openai.com/v1"
-api_key = "sk-..."  # Replace with your actual API key
+3. Install project dependencies
+
+```bash
+# Install project dependencies
+npm install
+```
+
+4. Generate key pair
+
+The project requires a public-private key pair for authentication, which can be generated with the following command (skip if you can generate certificates yourself):
+
+```bash
+npm run generate-keys
+
+# This will generate in the `web/keys` directory:
+# - `private.pem`: Private key file
+# - `public.pem`: Public key file
+```
+
+5. Database initialization
+
+The project uses PostgreSQL as the persistent database. You can use [Docker container](https://hub.docker.com/_/postgres) to start the database service
+
+```bash
+# Start docker container and automatically create database named openmanus
+docker run --name openmanus-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=openmanus -d -p 5432:5432 postgres
+```
+
+6. Environment variable configuration
+
+Create `.env` file in project root directory, configure necessary environment variables, refer to `/web/.env.example`
+
+```bash
+# If following step 5 database configuration, the database connection is
+DATABASE_URL="postgresql://postgres:postgres@localhost:5432/openmanus?schema=public"
+```
+
+7. Generate Prisma Client & Initialize Database
+
+```bash
+# If first time starting project, reinstalled dependencies, or schema.prisma has updates, execute this command to update Prisma Client
+npx prisma generate
+
+# If first time starting project, need to initialize database, this command will automatically sync table structure into configured database
+npx prisma db push
 ```
 
 ## Quick Start
 
-One line for run OpenManus:
+```bash
+# OpenManus Core starts with run_api.py
+python run_api.py
+```
 
 ```bash
-python main.py
+# OpenManus App needs to enter web/ directory, start with npm run dev
+cd web
+npm run dev
 ```
 
-Then input your idea via terminal!
+After starting, open `http://localhost:3000` to view
 
-For MCP tool version, you can run:
+## Acknowledgments
 
-```bash
-python run_mcp.py
-```
-
-For unstable multi-agent version, you also can run:
-
-```bash
-python run_flow.py
-```
-
-## How to contribute
-
-We welcome any friendly suggestions and helpful contributions! Just create issues or submit pull requests.
-
-Or contact @mannaandpoem via 📧email: mannaandpoem@gmail.com
-
-**Note**: Before submitting a pull request, please use the pre-commit tool to check your changes. Run `pre-commit run --all-files` to execute the checks.
-
-## Community Group
-
-Join our networking group on Feishu and share your experience with other developers!
-
-<div align="center" style="display: flex; gap: 20px;">
-    <img src="assets/community_group.jpg" alt="OpenManus 交流群" width="300" />
-</div>
-
-## Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=mannaandpoem/OpenManus&type=Date)](https://star-history.com/#mannaandpoem/OpenManus&Date)
-
-## Sponsors
-
-Thanks to [PPIO](https://ppinfra.com/user/register?invited_by=OCPKCN&utm_source=github_openmanus&utm_medium=github_readme&utm_campaign=link) for computing source support.
-
-> PPIO: The most affordable and easily-integrated MaaS and GPU cloud solution.
-
-## Acknowledgement
-
-Thanks to [anthropic-computer-use](https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo)
-and [browser-use](https://github.com/browser-use/browser-use) for providing basic support for this project!
-
-Additionally, we are grateful to [AAAJ](https://github.com/metauto-ai/agent-as-a-judge), [MetaGPT](https://github.com/geekan/MetaGPT), [OpenHands](https://github.com/All-Hands-AI/OpenHands) and [SWE-agent](https://github.com/SWE-agent/SWE-agent).
-
-We also thank stepfun(阶跃星辰) for supporting our Hugging Face demo space.
-
-OpenManus is built by contributors from MetaGPT. Huge thanks to this agent community!
-
-## Cite
-
-```bibtex
-@misc{openmanus2025,
-  author = {Xinbin Liang and Jinyu Xiang and Zhaoyang Yu and Jiayi Zhang and Sirui Hong and Sheng Fan and Xiao Tang},
-  title = {OpenManus: An open-source framework for building general AI agents},
-  year = {2025},
-  publisher = {Zenodo},
-  doi = {10.5281/zenodo.15186407},
-  url = {https://doi.org/10.5281/zenodo.15186407},
-}
-```
+This project originated from [OpenManus](https://github.com/mannaandpoem/OpenManus) First Hackathon. Many thanks to OpenManus for providing such a platform that made this project possible!
