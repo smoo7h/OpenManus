@@ -92,3 +92,34 @@ export const getToolsInfo = withUserAuth(async ({}: AuthWrapperContext<{}>) => {
   const tools = await prisma.tools.findMany({});
   return tools;
 });
+
+/**
+ * register a new tool
+ * only root user can register a new tool
+ */
+export const registerTool = withUserAuth(
+  async ({
+    user,
+    args: { name, description, command, args, envSchema },
+  }: AuthWrapperContext<{ name: string; description: string; command: string; args: string[]; envSchema: JSONSchema }>) => {
+    const u = await prisma.users.findUnique({ where: { email: user.email } });
+    if (!u) {
+      throw new Error('User not found');
+    }
+    if (u.email !== process.env.ROOT_USER_EMAIL) {
+      throw new Error('Unauthorized');
+    }
+
+    const tool = await prisma.tools.findUnique({ where: { name } });
+
+    if (tool) {
+      throw new Error('Tool already exists');
+    }
+
+    await prisma.tools.create({
+      data: { name, description, command, args, envSchema },
+    });
+
+    return { message: 'Tool registered successfully' };
+  },
+);

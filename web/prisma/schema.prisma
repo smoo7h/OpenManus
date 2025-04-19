@@ -152,7 +152,7 @@ model InviteCodes {
 
 model Tools {
   id          String   @id @default(cuid())
-  name        String
+  name        String   @unique
   description String?  @db.Text
   command     String
   args        Json     @default("[]")

@@ -52,5 +52,6 @@ export const getMe = withUserAuth(async ({ user, organization }: AuthWrapperCont
     name: user.name,
     organizationId: organization.id,
     organizationName: organization.name,
+    isRoot: user.email === process.env.ROOT_USER_EMAIL,
   };
 });

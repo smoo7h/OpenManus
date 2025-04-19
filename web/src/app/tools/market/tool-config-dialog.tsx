@@ -11,12 +11,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import * as z from 'zod';
 
-interface ToolInfo {
-  id: string;
-  name: string;
-  envSchema: Exclude<JSONSchema, boolean>;
-}
-
 interface ToolConfigDialogProps {
   onSuccess?: () => void;
 }
