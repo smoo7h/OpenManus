@@ -2,168 +2,168 @@
   <img src="assets/logo.jpg" width="200"/>
 </p>
 
-English | [中文](README.md)
+中文 | [English](README-en.md)
 
 # 🎉 iHeyTang OpenManus
 
-Manus is amazing, but OpenManus can realize any creative idea without an invitation code 🛫!
+Manus 非常棒，但 OpenManus 无需邀请码即可实现任何创意 🛫！
 
-(**Especially when it has an outstanding frontend interaction experience, it's simply fantastic!**)
+(**特别是当他它有了非常出色的前端交互体验，简直太棒了！**)
 
-## Project Vision
+## 项目愿景
 
-1. A versatile AI assistant for general domains, providing the strongest support for super individuals and one-person companies in the AI era
-2. Rapid development and validation of specialized domain AI agents, offering the best efficiency platform for vertical AI Agents
+1. 通用领域全能 AI 助手，为 AI 时代的超级个体和一人公司提供最有力的支持
+2. 专精领域 AI 智能体的快速开发验证，为垂类 AI Agent 提供最好的效率平台
 
-## Project Demo
+## 项目演示
 
-(Yes, it has full process replay capability, allowing you to share an execution process in an almost lossless way)
+(没错，它拥有全流程回放能力，这使得你可以将一个的执行过程以几乎无损的方式分享)
 
 https://openmanus.iheytang.com/share/tasks/cm9k3hmiv00ezo8011k4008qx
 
-## Project Features
+## 项目特点
 
-1. Clean and elegant operation interface - Command line? Not here.
-2. Multi-organization, multi-user support - This is great, each tenant can configure their own APIKey
-3. Background task execution - Ask questions, close the page, come back later to see the results
-4. Quick MCP integration - Fast installation from MCP marketplace, get started with MCP in 1 minute
-5. Task-partitioned workspace - Each task's attachments can be browsed separately
-6. Multi-turn conversations - Task not completed well? Keep asking questions
+1. 简洁优雅的操作界面 - 命令行？不存在的。
+2. 多组织、多用户支持 - 这个很棒，每个租户都可以配置自己的 APIKey
+3. 后台任务执行 - 提出问题，关掉页面，过会再回来看结果
+4. MCP 的快速集成 - MCP 市场快速安装，1 分钟内上手 MCP
+5. 以任务为分区的工作区 - 每一个任务的附件都能够单独浏览
+6. 多轮对话 - 任务完成的不好？再继续追问
 
-## Installation Guide
+## 安装指南
 
-The project is divided into two parts: Core (root directory) and App (web/)
+该项目分为两个部分，分别是 Core (根目录) 和 App (web/)
 
 ### OpenManus Core
 
-1. Install uv (a fast Python package manager):
+1. 安装 uv（一个快速的 Python 包管理器）：
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh
 ```
 
-2. Clone the repository:
+2. 克隆仓库：
 
 ```bash
 git clone https://github.com/iHeyTang/OpenManus.git
 cd OpenManus
 ```
 
-3. Create and activate virtual environment:
+3. 创建并激活虚拟环境：
 
 ```bash
 uv venv --python 3.12
-source .venv/bin/activate  # Unix/macOS systems
-# For Windows systems use:
+source .venv/bin/activate  # Unix/macOS 系统
+# Windows 系统使用：
 # .venv\Scripts\activate
 
-# After successful installation, you'll see the following prompt. You can either restart Terminal or follow these instructions:
+# 安装成功后，会有以下提示，可以选择重开Terminal 或 按照以下提示进行操作
 #To add $HOME/.local/bin to your PATH, either restart your shell or run:
 #    source $HOME/.local/bin/env (sh, bash, zsh)
 #    source $HOME/.local/bin/env.fish (fish)
 
-# Verify uv installation success
+# 验证 uv 安装成功
 uv --version
-# Output the following version number indicates successful installation
+# 输出以下版本号则表示安装成功
 # uv 0.6.14 (a4cec56dc 2025-04-09)
 ```
 
-4. Install dependencies:
+4. 安装依赖：
 
 ````bash
 uv pip install -r requirements.txt
 
-### Install browser automation tool playwright
+### 安装浏览器自动化工具 playwright
 ```bash
 playwright install
 ````
 
-5. Install Docker environment, recommended [Docker Desktop](https://www.docker.com/products/docker-desktop/) for Windows, [Orbstack](https://orbstack.dev/download) for MacOS or Linux
+5. 安装 Docker 环境，windows 推荐 [Docker Desktop](https://www.docker.com/products/docker-desktop/)，MacOS 或 Linux 推荐 [Orbstack](https://orbstack.dev/download)
 
 ### OpenManus App
 
-1. Install `node` environment
+1. 安装 `node` 环境
 
-   Method 1: [Recommended] Use nvm package manager https://github.com/nvm-sh/nvm
-   Method 2: Download from official website https://nodejs.org/en
-   Method 3: (Windows systems) Use nvm package manager https://github.com/coreybutler/nvm-windows/releases/tag/1.2.2
+   方式 1: [推荐] 使用 nvm 包管理器 https://github.com/nvm-sh/nvm
+   方式 2: 前往官方下载 https://nodejs.org/en
+   方式 3: (Windows 系统) 使用 nvm 包管理器 https://github.com/coreybutler/nvm-windows/releases/tag/1.2.2
 
 ```bash
-# After installation, verify success with command
+# 按照流程安装完毕后，通过命令确认安装成功
 node -v
-# Output version number indicates successful installation
+# 输出版本号表示安装成功
 # v20.19.0
 ```
 
-2. Enter `web/` folder
+2. 进入 `web/` 文件夹
 
 ```bash
-# Ignore if already in web directory
+# 如果已经在 web 目录下忽略即可
 cd web
 ```
 
-3. Install project dependencies
+3. 安装项目依赖
 
 ```bash
-# Install project dependencies
+# 安装项目依赖
 npm install
 ```
 
-4. Generate key pair
+4. 生成密钥对
 
-The project requires a public-private key pair for authentication, which can be generated with the following command (skip if you can generate certificates yourself):
+项目需要一对公钥和私钥用于认证，可以通过以下命令生成（有自行生成证书能力的忽略即可）：
 
 ```bash
 npm run generate-keys
 
-# This will generate in the `web/keys` directory:
-# - `private.pem`: Private key file
-# - `public.pem`: Public key file
+# 这将在 `web/keys` 目录生成：
+# - `private.pem`: 私钥文件
+# - `public.pem`: 公钥文件
 ```
 
-5. Database initialization
+5. 数据库初始化
 
-The project uses PostgreSQL as the persistent database. You can use [Docker container](https://hub.docker.com/_/postgres) to start the database service
+项目使用 PostgreSQL 作为持久化数据库。可使用 [Docker 容器](https://hub.docker.com/_/postgres) 来启动数据库服务
 
 ```bash
-# Start docker container and automatically create database named openmanus
+# 启动 docker 容器 并自动创建 名为 openmanus 的数据库
 docker run --name openmanus-db -e POSTGRES_USER=postgres -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=openmanus -d -p 5432:5432 postgres
 ```
 
-6. Environment variable configuration
+6. 环境变量配置
 
-Create `.env` file in project root directory, configure necessary environment variables, refer to `/web/.env.example`
+在项目根目录创建 `.env` 文件，配置必要的环境变量，具体参考 `/web/.env.example`
 
 ```bash
-# If following step 5 database configuration, the database connection is
+# 若按照 步骤 5 配置数据库，则数据库连接为
 DATABASE_URL="postgresql://postgres:postgres@localhost:5432/openmanus?schema=public"
 ```
 
-7. Generate Prisma Client & Initialize Database
+7. 生成 Prisma 客户端 & 初始化数据库
 
 ```bash
-# If first time starting project, reinstalled dependencies, or schema.prisma has updates, execute this command to update Prisma Client
+# 若第一次启动项目、重新安装了依赖、schema.prisma 存在更新，需执行此命令更新 Prisma Client
 npx prisma generate
 
-# If first time starting project, need to initialize database, this command will automatically sync table structure into configured database
+# 若第一次启动项目，需要先初始化数据库，此命令会自动将表结构同步进相应配置的数据库中
 npx prisma db push
 ```
 
-## Quick Start
+## 快速启动
 
 ```bash
-# OpenManus Core starts with run_api.py
+# OpenManus Core 使用 run_api.py 启动
 python run_api.py
 ```
 
 ```bash
-# OpenManus App needs to enter web/ directory, start with npm run dev
+# OpenManus App 需要进入 web/ 目录， 使用 npm run dev 启动
 cd web
 npm run dev
 ```
 
-After starting, open `http://localhost:3000` to view
+启动完毕后，打开 `http://localhost:3000` 即可查看
 
-## Acknowledgments
+## 致谢
 
-This project originated from [OpenManus](https://github.com/mannaandpoem/OpenManus) First Hackathon. Many thanks to OpenManus for providing such a platform that made this project possible!
+本项目起源于 [OpenManus](https://github.com/mannaandpoem/OpenManus) First Hackathon，非常感谢 OpenManus 提供这样的一个平台，得以让本项目有了落地的机会!
