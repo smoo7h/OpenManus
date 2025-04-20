@@ -1,9 +1,7 @@
-import asyncio
 import time
 from contextlib import AsyncExitStack
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
-import docker
 from mcp import ClientSession, StdioServerParameters
 from mcp.client.sse import sse_client
 from mcp.client.stdio import stdio_client
@@ -13,6 +11,126 @@ from app.config import config
 from app.logger import logger
 from app.tool.base import BaseTool, ToolResult
 from app.tool.tool_collection import ToolCollection
+
+
+class MCPToolCallSandboxHost:
+    """A context manager for handling multiple MCP client connections.
+
+    This class is responsible for:
+    1. Maintaining multiple MCP client connections
+    2. Managing client lifecycles
+    3. Providing CRUD operations for clients
+    """
+
+    def __init__(self):
+        # Dictionary to store multiple client connections
+        # key: client_id, value: MCPSandboxClients instance
+        self.clients: Dict[str, MCPSandboxClients] = {}
+
+    async def add_sse_client(
+        self, client_id: str, server_url: str
+    ) -> "MCPSandboxClients":
+        """Add a new SSE-based MCP client connection running in a sandbox.
+
+        Args:
+            client_id: Unique identifier for the client
+            server_url: URL of the MCP server
+
+        Returns:
+            MCPSandboxClients: The newly created sandboxed client instance
+
+        Raises:
+            ValueError: If client_id already exists
+        """
+        if client_id in self.clients:
+            raise ValueError(f"Client ID '{client_id}' already exists")
+
+        client = MCPSandboxClients(client_id=client_id)
+        await client.connect_sse(server_url=server_url)
+        self.clients[client_id] = client
+        return client
+
+    async def add_stdio_client(
+        self,
+        client_id: str,
+        command: str,
+        args: Optional[List[str]] = None,
+        env: Optional[Dict[str, str]] = None,
+    ) -> "MCPSandboxClients":
+        """Add a new STDIO-based MCP client connection running in a sandbox.
+
+        Args:
+            client_id: Unique identifier for the client
+            command: Command to execute
+            args: List of command arguments
+
+        Returns:
+            MCPSandboxClients: The newly created sandboxed client instance
+
+        Raises:
+            ValueError: If client_id already exists
+        """
+        if client_id in self.clients:
+            raise ValueError(f"Client ID '{client_id}' already exists")
+
+        client = MCPSandboxClients(client_id=client_id)
+        await client.connect_stdio(command=command, args=args or [], env=env or {})
+        self.clients[client_id] = client
+        return client
+
+    def get_client(self, client_id: str) -> Optional["MCPSandboxClients"]:
+        """Retrieve a specific MCP client.
+
+        Args:
+            client_id: Unique identifier for the client
+
+        Returns:
+            Optional[Union[MCPClients, MCPSandboxClients]]: The client instance if found, None otherwise
+        """
+        return self.clients.get(client_id)
+
+    async def remove_client(self, client_id: str) -> bool:
+        """Remove and disconnect a specific MCP client connection.
+
+        Args:
+            client_id: Unique identifier for the client
+
+        Returns:
+            bool: True if client was found and removed, False otherwise
+        """
+        if client := self.clients.pop(client_id, None):
+            await client.disconnect()
+            return True
+        return False
+
+    async def disconnect_all(self) -> None:
+        """Disconnect all MCP client connections."""
+        client_ids = list(self.clients.keys())
+        # If the list is not reversed, there would be error when disconnecting the client.
+        # such like `Attempted to exit a cancel scope that isn't the current tasks's current cancel scope`
+        # I don't know why should reverse the list, but it works,
+        # if you know the reason, please let me know. Thanks!
+        # by author @iheytang
+        client_ids.reverse()
+        for client_id in client_ids:
+            await self.get_client(client_id).disconnect()
+
+    def list_clients(self) -> List[str]:
+        """Get a list of all client IDs.
+
+        Returns:
+            List[str]: List of all connected client IDs
+        """
+        return list(self.clients.keys())
+
+    def get_client_count(self) -> int:
+        """Get the current number of connected clients.
+
+        Returns:
+            int: Number of clients
+        """
+        return len(self.clients)
+
 
 class MCPSandboxClientTool(BaseTool):
     """Represents a tool proxy that can be called on the MCP server from the client side, running in a sandbox."""
@@ -48,7 +166,6 @@ class MCPSandboxClients(ToolCollection):
     exit_stack: AsyncExitStack = None
     description: str = "MCP client tools running in container for server interaction"
     client_id: str = ""
-    _docker_client: Optional[docker.DockerClient] = None
 
     # Container management
     container_name: Optional[str] = None
@@ -59,17 +176,6 @@ class MCPSandboxClients(ToolCollection):
         self.name = f"mcp-{client_id}"  # Keep name for backward compatibility
         self.client_id = client_id
         self.exit_stack = AsyncExitStack()
-        self._docker_client = docker.from_env()
-
-        # ensure network exists
-        try:
-            self._docker_client.networks.get("openmanus-container-network")
-        except docker.errors.NotFound:
-            logger.info("Creating openmanus-container-network...")
-            self._docker_client.networks.create(
-                "openmanus-container-network", driver="bridge", check_duplicate=True
-            )
-            logger.info("Network created successfully")
 
         # Always create a new container but use cached images
         # Generate a container name with timestamp to ensure uniqueness
@@ -117,7 +223,6 @@ class MCPSandboxClients(ToolCollection):
                 docker_args.append("-i")
 
             docker_args.extend(["-v", f"{config.host_workspace_root}:/workspace"])
-            docker_args.extend(["--network", "openmanus-container-network"])
             docker_args.extend([parameters.command, *parameters.args])
 
             return StdioServerParameters(
@@ -128,9 +233,6 @@ class MCPSandboxClients(ToolCollection):
 
         # Otherwise create a new container with --rm flag to ensure cleanup
         docker_args = ["run", "--rm", "-i", "--name", self.container_name]
-
-        # Add network configuration
-        docker_args.extend(["--network", "openmanus-container-network"])
 
         # Add volume mounts for package caches to persist between container runs
         if command_type == "uvx":
@@ -212,14 +314,12 @@ class MCPSandboxClients(ToolCollection):
             StdioServerParameters(command=command, args=args, env=env)
         )
         # Use stdio_client provided by mcp library
-        stdio_transport = await self.exit_stack.enter_async_context(
-            stdio_client(server_params)
-        )
-        read, write = stdio_transport
-        self.session = await self.exit_stack.enter_async_context(
-            ClientSession(read, write)
-        )
-        logger.info("Client session created")
+        try:
+            s = await self.exit_stack.enter_async_context(stdio_client(server_params))
+            self.session = await self.exit_stack.enter_async_context(ClientSession(*s))
+        except Exception as e:
+            logger.error(f"Error creating stdio client {self.client_id}: {e}")
+            raise
 
         # Directly call the initialization method
         await self._initialize_and_list_tools()
@@ -231,38 +331,16 @@ class MCPSandboxClients(ToolCollection):
         if self.session:
             await self.disconnect()
 
+        # Use AsyncExitStack to manage async context
         try:
-            # Use AsyncExitStack to manage async context
-            streams = await self.exit_stack.enter_async_context(
-                sse_client(url=server_url)
-            )
-            self.session = await self.exit_stack.enter_async_context(
-                ClientSession(*streams)
-            )
-            logger.info("Client session created")
-
-            # Initialize session
-            logger.info("Initializing MCP session...")
-            try:
-                await self.session.initialize()
-                logger.info("MCP session initialized successfully")
-            except Exception as e:
-                logger.error(f"Failed to initialize MCP session: {e}")
-                await self.disconnect()
-                raise RuntimeError(f"Failed to initialize MCP session: {e}")
-
-            # Fetch available tools from MCP server
-            try:
-                await self._initialize_and_list_tools()
-            except Exception as e:
-                logger.error(f"Failed to list tools: {e}")
-                await self.disconnect()
-                raise RuntimeError(f"Failed to list tools: {e}")
-
+            s = await self.exit_stack.enter_async_context(sse_client(url=server_url))
+            self.session = await self.exit_stack.enter_async_context(ClientSession(*s))
         except Exception as e:
-            logger.error(f"Failed to connect to MCP server: {e}")
-            await self.disconnect()
-            raise RuntimeError(f"Failed to connect to MCP server: {e}")
+            logger.error(f"Error creating sse client {self.client_id}: {e}")
+            raise
+
+        # Fetch available tools from MCP server
+        await self._initialize_and_list_tools()
 
     async def _initialize_and_list_tools(self) -> None:
         """Initialize session and populate tool map."""
@@ -316,18 +394,3 @@ class MCPSandboxClients(ToolCollection):
             self.session = None
             self.tools = tuple()
             self.tool_map = {}
-
-            # clean up docker client
-            if self._docker_client:
-                self._docker_client.close()
-                self._docker_client = None
-
-            logger.info(
-                f"Disconnected from MCP server and cleaned up container for client {self.client_id}"
-            )
-
-    def __del__(self):
-        """Ensure Docker client resources are cleaned up when the object is garbage collected"""
-        if self._docker_client:
-            self._docker_client.close()
-            self._docker_client = None

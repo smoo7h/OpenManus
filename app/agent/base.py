@@ -291,9 +291,12 @@ class BaseAgent(BaseModel, ABC):
             BaseAgentEvents.MEMORY_ADDED, {"role": role, "message": message.to_dict()}
         )
 
-    async def plan(self, request: str) -> None:
+    async def prepare(self) -> None:
+        """Prepare the agent for execution."""
+        pass
+
+    async def plan(self) -> None:
         """Plan the agent's actions for the given request."""
-        self.update_memory("user", request)
 
     async def run(self, request: Optional[str] = None) -> str:
         """Execute the agent's main loop asynchronously.
@@ -313,9 +316,10 @@ class BaseAgent(BaseModel, ABC):
         self.emit(BaseAgentEvents.LIFECYCLE_START, {"request": request})
 
         results: List[str] = []
+        await self.prepare()
         async with self.state_context(AgentState.RUNNING):
             if request:
-                await self.plan(request)
+                await self.plan()
             while (
                 self.current_step < self.max_steps and self.state != AgentState.FINISHED
             ):
@@ -344,6 +348,7 @@ class BaseAgent(BaseModel, ABC):
                     BaseAgentEvents.STEP_MAX_REACHED, {"max_steps": self.max_steps}
                 )
                 results.append(f"Terminated: Reached max steps ({self.max_steps})")
+
         await SANDBOX_CLIENT.cleanup()
         if self.should_terminate:
             self.emit(

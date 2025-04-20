@@ -8,7 +8,7 @@ from app.agent.base import BaseAgentEvents
 from app.agent.browser import BrowserContextHelper
 from app.agent.react import ReActAgent
 from app.agent.toolcall import ToolCallContextHelper
-from app.config import config
+from app.logger import logger
 from app.prompt.manus import NEXT_STEP_PROMPT, PLAN_PROMPT, SYSTEM_PROMPT
 from app.schema import Message
 from app.tool import Terminate, ToolCollection
@@ -77,7 +77,7 @@ class Manus(ReActAgent):
     )
 
     max_steps: int = 20
-    user_prompt: str = ""
+    task_request: str = ""
 
     tool_call_context_helper: Optional[ToolCallContextHelper] = None
     browser_context_helper: Optional[BrowserContextHelper] = None
@@ -85,28 +85,34 @@ class Manus(ReActAgent):
     task_dir: str = ""
     language: Optional[str] = Field(None, description="Language for the agent")
 
-    async def initialize(
+    def initialize(
         self,
         task_id: str,
         language: Optional[str] = None,
         tools: Optional[list[Union[McpToolConfig, str]]] = None,
         max_steps: Optional[int] = None,
-        user_prompt: Optional[str] = None,
+        task_request: Optional[str] = None,
     ):
         self.task_id = task_id
         self.language = language
         self.task_dir = f"/workspace/{task_id}"
         self.current_step = 0
+        self.tools = tools
 
         if max_steps is not None:
             self.max_steps = max_steps
 
-        if user_prompt is not None:
-            self.user_prompt = user_prompt
+        if task_request is not None:
+            self.task_request = task_request
 
-        if not os.path.exists(config.workspace_root):
-            os.makedirs(config.workspace_root)
+        return self
 
+    @model_validator(mode="after")
+    def initialize_helper(self) -> "Manus":
+        return self
+
+    async def prepare(self) -> None:
+        """Prepare the agent for execution."""
         self.system_prompt = SYSTEM_PROMPT.format(
             directory="/workspace",
             task_id=self.task_id,
@@ -115,7 +121,7 @@ class Manus(ReActAgent):
             current_date=datetime.now().strftime("%Y-%m-%d"),
             max_steps=self.max_steps,
             current_step=self.current_step,
-            user_prompt=self.user_prompt,
+            user_prompt=self.task_request,
         )
 
         self.next_step_prompt = NEXT_STEP_PROMPT.format(
@@ -123,19 +129,17 @@ class Manus(ReActAgent):
             current_step=self.current_step,
             remaining_steps=self.max_steps - self.current_step,
             task_dir=self.task_dir,
-            user_prompt=self.user_prompt,
+            user_prompt=self.task_request,
         )
 
         self.memory.add_message(Message.system_message(self.system_prompt))
 
         self.browser_context_helper = BrowserContextHelper(self)
         self.tool_call_context_helper = ToolCallContextHelper(self)
-        # Add general-purpose tools to the tool collection
-        self.tool_call_context_helper.available_tools = ToolCollection(
-            Terminate(),
-        )
-        if tools:
-            for tool in tools:
+        self.tool_call_context_helper.available_tools = ToolCollection(Terminate())
+
+        if self.tools:
+            for tool in self.tools:
                 if isinstance(tool, str) and tool in SYSTEM_TOOLS_MAP:
                     inst = SYSTEM_TOOLS_MAP[tool]()
                     await self.tool_call_context_helper.add_tool(inst)
@@ -151,10 +155,13 @@ class Manus(ReActAgent):
                         }
                     )
 
+    async def plan(self) -> None:
+        """Create an initial plan based on the user request."""
+        # Create planning message
         self.plan_prompt = PLAN_PROMPT.format(
             language=self.language or "English",
             max_steps=self.max_steps,
-            user_prompt=self.user_prompt,
+            user_prompt=self.task_request,
             available_tools="\n".join(
                 [
                     f"- {tool.name}: {tool.description}"
@@ -162,25 +169,18 @@ class Manus(ReActAgent):
                 ]
             ),
         )
-
-        return self
-
-    @model_validator(mode="after")
-    def initialize_helper(self) -> "Manus":
-        return self
-
-    async def plan(self, request: str) -> None:
-        """Create an initial plan based on the user request."""
-        # Create planning message
         planning_message = await self.llm.ask(
-            [Message.system_message(self.plan_prompt), Message.user_message(request)],
+            [
+                Message.system_message(self.plan_prompt),
+                Message.user_message(self.task_request),
+            ],
             system_msgs=[Message.system_message(self.system_prompt)],
         )
 
         self.emit(BaseAgentEvents.LIFECYCLE_PLAN, {"plan": planning_message})
 
         # Add the planning message to memory
-        self.update_memory("user", request)
+        self.update_memory("user", self.task_request)
         self.update_memory("user", planning_message)
 
     async def think(self) -> bool:
@@ -192,7 +192,7 @@ class Manus(ReActAgent):
             current_step=self.current_step,
             remaining_steps=self.max_steps - self.current_step,
             task_dir=self.task_dir,
-            user_prompt=self.user_prompt,
+            user_prompt=self.task_request,
         )
 
         browser_in_use = self._check_browser_in_use_recently()
@@ -227,7 +227,11 @@ class Manus(ReActAgent):
 
     async def cleanup(self):
         """Clean up Manus agent resources."""
+        logger.info(f"🧹 Cleaning up resources for agent '{self.name}'...")
         if self.browser_context_helper:
             await self.browser_context_helper.cleanup_browser()
         if self.tool_call_context_helper:
             await self.tool_call_context_helper.cleanup_tools()
+        if self.tool_call_context_helper.mcp:
+            await self.tool_call_context_helper.mcp.disconnect_all()
+        logger.info(f"✨ Cleanup complete for agent '{self.name}'.")

@@ -64,11 +64,14 @@ async def run_task(task_id: str, prompt: str):
 
         # Run the agent
         await agent.run(prompt)
+        await agent.cleanup()
 
         # Ensure all events have been processed
         queue = task_manager.queues[task_id]
         while not queue.empty():
             await asyncio.sleep(0.1)
+        # Remove the task from the task manager
+        await task_manager.remove_task(task_id)
 
     except Exception as e:
         logger.error(f"Error in task {task_id}: {str(e)}")
@@ -102,7 +105,6 @@ async def event_generator(task_id: str):
             logger.error(f"Error in event stream: {str(e)}")
             yield f"event: error\ndata: {dumps({'message': str(e)})}\n\n"
             break
-    await task_manager.remove_task(task_id)
 
 
 def parse_tools(tools: list[str]) -> list[Union[str, McpToolConfig]]:
@@ -180,12 +182,13 @@ async def create_task(
         ),
     )
 
-    await task.agent.initialize(
+    task.agent.initialize(
         task_id,
         language=(
             preferences_dict.get("language", "English") if preferences_dict else None
         ),
         tools=processed_tools,
+        task_request=prompt,
     )
 
     if files:
@@ -321,12 +324,13 @@ async def restart_task(
             else:
                 task.agent.update_memory(role="assistant", content=message["message"])
 
-    await task.agent.initialize(
+    task.agent.initialize(
         task_id,
         language=(
             preferences_dict.get("language", "English") if preferences_dict else None
         ),
         tools=processed_tools,
+        task_request=prompt,
     )
 
     if files:
