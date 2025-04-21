@@ -33,7 +33,10 @@ type AgentLifecycleStepType =
 type AgentLifecycleType =
   | AgentLifecycleStepType
   | 'agent:lifecycle:start'
-  | 'agent:lifecycle:plan'
+  | 'agent:lifecycle:prepare:start'
+  | 'agent:lifecycle:prepare:complete'
+  | 'agent:lifecycle:plan:start'
+  | 'agent:lifecycle:plan:complete'
   | 'agent:lifecycle:memory:added'
   | 'agent:lifecycle:state:change'
   | 'agent:lifecycle:complete'
@@ -41,6 +44,8 @@ type AgentLifecycleType =
 
 type AggregatedMessageType =
   | 'agent:lifecycle'
+  | 'agent:lifecycle:prepare'
+  | 'agent:lifecycle:plan'
   | 'agent:lifecycle:step'
   | 'agent:lifecycle:step:think'
   | 'agent:lifecycle:step:act'

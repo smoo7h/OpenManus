@@ -53,7 +53,10 @@ BASE_AGENT_EVENTS_PREFIX = "agent:lifecycle"
 class BaseAgentEvents:
     # Lifecycle events
     LIFECYCLE_START = f"{BASE_AGENT_EVENTS_PREFIX}:start"
-    LIFECYCLE_PLAN = f"{BASE_AGENT_EVENTS_PREFIX}:plan"
+    LIFECYCLE_PREPARE_START = f"{BASE_AGENT_EVENTS_PREFIX}:prepare:start"
+    LIFECYCLE_PREPARE_COMPLETE = f"{BASE_AGENT_EVENTS_PREFIX}:prepare:complete"
+    LIFECYCLE_PLAN_START = f"{BASE_AGENT_EVENTS_PREFIX}:plan:start"
+    LIFECYCLE_PLAN_COMPLETE = f"{BASE_AGENT_EVENTS_PREFIX}:plan:complete"
     LIFECYCLE_COMPLETE = f"{BASE_AGENT_EVENTS_PREFIX}:complete"
     LIFECYCLE_TERMINATING = f"{BASE_AGENT_EVENTS_PREFIX}:terminating"
     LIFECYCLE_TERMINATED = f"{BASE_AGENT_EVENTS_PREFIX}:terminated"
@@ -295,8 +298,9 @@ class BaseAgent(BaseModel, ABC):
         """Prepare the agent for execution."""
         pass
 
-    async def plan(self) -> None:
+    async def plan(self) -> str:
         """Plan the agent's actions for the given request."""
+        return ""
 
     async def run(self, request: Optional[str] = None) -> str:
         """Execute the agent's main loop asynchronously.
@@ -316,10 +320,16 @@ class BaseAgent(BaseModel, ABC):
         self.emit(BaseAgentEvents.LIFECYCLE_START, {"request": request})
 
         results: List[str] = []
+        self.emit(BaseAgentEvents.LIFECYCLE_PREPARE_START, {})
         await self.prepare()
+        self.emit(BaseAgentEvents.LIFECYCLE_PREPARE_COMPLETE, {})
         async with self.state_context(AgentState.RUNNING):
             if request:
-                await self.plan()
+                self.emit(BaseAgentEvents.LIFECYCLE_PLAN_START, {})
+                plan_result = await self.plan()
+                self.emit(
+                    BaseAgentEvents.LIFECYCLE_PLAN_COMPLETE, {"plan": plan_result}
+                )
             while (
                 self.current_step < self.max_steps and self.state != AgentState.FINISHED
             ):

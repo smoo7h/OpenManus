@@ -24,6 +24,8 @@ class ChatMessageAggregator {
     let currentAct: AggregatedMessage | null = null;
     let currentTool: AggregatedMessage | null = null;
     let currentBrowser: AggregatedMessage | null = null;
+    let currentPlan: AggregatedMessage | null = null;
+    let currentPrepare: AggregatedMessage | null = null;
 
     for (const message of this._messages) {
       // Handle non-lifecycle messages
@@ -45,9 +47,42 @@ class ChatMessageAggregator {
         continue;
       }
 
+      // Handle plan messages
+      if (message.type?.startsWith('agent:lifecycle:plan')) {
+        if (message.type === 'agent:lifecycle:plan:start') {
+          currentPlan = {
+            ...message,
+            type: 'agent:lifecycle:plan',
+            messages: [message],
+          } as AggregatedMessage;
+          if (currentLifecycle && 'messages' in currentLifecycle) {
+            currentLifecycle.messages.push(currentPlan);
+          }
+        } else if (currentPlan && 'messages' in currentPlan) {
+          currentPlan.messages.push(message);
+        }
+        continue;
+      }
+
+      // Handle prepare messages
+      if (message.type?.startsWith('agent:lifecycle:prepare')) {
+        if (message.type === 'agent:lifecycle:prepare:start') {
+          currentPrepare = {
+            ...message,
+            type: 'agent:lifecycle:prepare',
+            messages: [message],
+          } as AggregatedMessage;
+          if (currentLifecycle && 'messages' in currentLifecycle) {
+            currentLifecycle.messages.push(currentPrepare);
+          }
+        } else if (currentPrepare && 'messages' in currentPrepare) {
+          currentPrepare.messages.push(message);
+        }
+        continue;
+      }
+
       // Handle top-level lifecycle messages
       if (
-        message.type === 'agent:lifecycle:plan' ||
         message.type === 'agent:lifecycle:complete' ||
         message.type === 'agent:lifecycle:terminated' ||
         message.type === 'agent:lifecycle:memory:added' ||

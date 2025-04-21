@@ -5,17 +5,67 @@ import { formatNumber } from '@/lib/utils';
 import '@/styles/animations.css';
 import { StepBadge } from './step';
 import { ToolMessageContent } from './tools';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { cn } from '@/lib/utils';
+
 interface ChatMessageProps {
   messages: AggregatedMessage[];
 }
 
 const UserMessage = ({ message }: { message: Message<{ request: string }> }) => <Markdown className="chat">{message.content.request}</Markdown>;
 
-const PlanMessage = ({ message }: { message: Message<{ plan: string }> }) => {
+const PrepareMessage = ({ message }: { message: AggregatedMessage & { type: 'agent:lifecycle:prepare' } }) => {
+  const prepareCompleteMessage = message.messages.find(msg => msg.type === 'agent:lifecycle:prepare:complete') as
+    | (AggregatedMessage & { type: 'agent:lifecycle:prepare:complete' })
+    | undefined;
+
   return (
     <div className="container mx-auto max-w-4xl">
-      <div className="text-lg font-bold">📋 Manus</div>
-      <Markdown className="chat">{message.content.plan}</Markdown>
+      <div className="mb-2 text-lg font-bold">✨ Manus</div>
+      {!prepareCompleteMessage ? (
+        <div className="text-muted-foreground mt-2 mb-2 font-mono text-xs">
+          <Badge
+            variant={prepareCompleteMessage ? 'outline' : 'default'}
+            className={cn('cursor-pointer font-mono text-xs', prepareCompleteMessage && 'text-muted-foreground')}
+          >
+            <span className="spinning-animation">⚙️ </span>
+            <span>Preparing...</span>
+          </Badge>
+        </div>
+      ) : (
+        <Badge variant="outline" className="cursor-pointer font-mono">
+          ⚙️ Prepared
+        </Badge>
+      )}
+    </div>
+  );
+};
+
+const PlanMessage = ({ message }: { message: AggregatedMessage & { type: 'agent:lifecycle:plan' } }) => {
+  const planCompleteMessage = message.messages.find(msg => msg.type === 'agent:lifecycle:plan:complete') as
+    | (AggregatedMessage & { type: 'agent:lifecycle:plan:complete' })
+    | undefined;
+
+  return (
+    <div className="container mx-auto max-w-4xl">
+      <div className="mb-2 text-lg font-bold">✨ Manus</div>
+      {planCompleteMessage ? (
+        <div className="space-y-2">
+          <div className="text-muted-foreground mt-2 mb-2 font-mono text-xs">
+            <Badge variant="outline" className="cursor-pointer font-mono text-xs">
+              <span>📝 Plan Completed</span>
+            </Badge>
+          </div>
+          <Markdown className="chat">{planCompleteMessage?.content.plan}</Markdown>
+        </div>
+      ) : (
+        <div className="text-muted-foreground mt-2 mb-2 font-mono text-xs">
+          <Badge className="cursor-pointer font-mono text-xs">
+            <span className="thinking-animation">📝</span>
+            <span>Planning...</span>
+          </Badge>
+        </div>
+      )}
     </div>
   );
 };
@@ -126,11 +176,18 @@ const LifecycleMessage = ({ message }: { message: AggregatedMessage }) => {
           );
         }
 
-        // 处理生命周期开始计划
+        if (msg.type === 'agent:lifecycle:prepare') {
+          return (
+            <div key={index} className="container mx-auto max-w-4xl">
+              <PrepareMessage message={msg as AggregatedMessage & { type: 'agent:lifecycle:prepare' }} />
+            </div>
+          );
+        }
+
         if (msg.type === 'agent:lifecycle:plan') {
           return (
             <div key={index} className="container mx-auto max-w-4xl">
-              <PlanMessage message={msg as Message<{ plan: string }>} />
+              <PlanMessage message={msg as AggregatedMessage & { type: 'agent:lifecycle:plan' }} />
             </div>
           );
         }
