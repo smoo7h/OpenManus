@@ -1,7 +1,7 @@
 'use server';
 
 import { AuthWrapperContext, withUserAuth } from '@/lib/auth-wrapper';
-import { decryptWithPrivateKey } from '@/lib/crypto';
+import { decryptLongTextWithPrivateKey, decryptWithPrivateKey } from '@/lib/crypto';
 import { LANGUAGE_CODES } from '@/lib/language';
 import { prisma } from '@/lib/prisma';
 import { to } from '@/lib/to';
@@ -58,7 +58,7 @@ export const createTask = withUserAuth(async ({ organization, args }: AuthWrappe
   const processedTools = tools.map(tool => {
     const orgTool = organizationTools.find(ot => ot.tool.id === tool);
     if (orgTool) {
-      const env = orgTool.env ? JSON.parse(decryptWithPrivateKey(orgTool.env, privateKey)) : {};
+      const env = orgTool.env ? JSON.parse(decryptLongTextWithPrivateKey(orgTool.env, privateKey)) : {};
       return JSON.stringify({
         id: orgTool.tool.id,
         name: orgTool.tool.name,
@@ -155,7 +155,7 @@ export const restartTask = withUserAuth(
     const processedTools = tools.map(tool => {
       const orgTool = organizationTools.find(ot => ot.tool.id === tool);
       if (orgTool) {
-        const env = orgTool.env ? JSON.parse(decryptWithPrivateKey(orgTool.env, privateKey)) : {};
+        const env = orgTool.env ? JSON.parse(decryptLongTextWithPrivateKey(orgTool.env, privateKey)) : {};
         return JSON.stringify({
           id: orgTool.tool.id,
           name: orgTool.tool.name,

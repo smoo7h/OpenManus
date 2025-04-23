@@ -1,6 +1,6 @@
 'use server';
 import { AuthWrapperContext, withUserAuth } from '@/lib/auth-wrapper';
-import { encryptWithPublicKey } from '@/lib/crypto';
+import { encryptLongTextWithPublicKey } from '@/lib/crypto';
 import { prisma } from '@/lib/prisma';
 import Ajv from 'ajv';
 import fs from 'fs';
@@ -59,20 +59,20 @@ export const installTool = withUserAuth(async ({ organization, args }: AuthWrapp
   }
 
   const existing = await prisma.organizationTools.findUnique({
-    where: { id: toolId, organizationId: organization.id },
+    where: { toolId_organizationId: { toolId: toolId, organizationId: organization.id } },
   });
 
   if (existing) {
     await prisma.organizationTools.update({
-      where: { id: toolId, organizationId: organization.id },
-      data: { env: encryptWithPublicKey(JSON.stringify(env), publicKey) },
+      where: { toolId_organizationId: { toolId: toolId, organizationId: organization.id } },
+      data: { env: encryptLongTextWithPublicKey(JSON.stringify(env), publicKey) },
     });
   } else {
     await prisma.organizationTools.create({
       data: {
         organizationId: organization.id,
         toolId: toolId,
-        env: encryptWithPublicKey(JSON.stringify(env), publicKey),
+        env: encryptLongTextWithPublicKey(JSON.stringify(env), publicKey),
       },
     });
   }

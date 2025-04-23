@@ -1,11 +1,25 @@
 import fs from 'fs';
 import path from 'path';
-import { generateKeyPair } from '../src/lib/crypto';
+import crypto from 'crypto';
 
 const KEYS_DIR = path.join(process.cwd(), 'keys');
 
 if (!fs.existsSync(KEYS_DIR)) {
   fs.mkdirSync(KEYS_DIR);
+}
+
+function generateKeyPair() {
+  return crypto.generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+    publicKeyEncoding: {
+      type: 'spki',
+      format: 'pem',
+    },
+    privateKeyEncoding: {
+      type: 'pkcs8',
+      format: 'pem',
+    },
+  });
 }
 
 const { publicKey, privateKey } = generateKeyPair();
